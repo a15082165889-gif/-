@@ -41,7 +41,8 @@ def main():
     ap.add_argument("--stills", nargs="*", type=float)
     ap.add_argument("--plan", action="store_true")
     ap.add_argument("--jobs", type=int, default=4)
-    ap.add_argument("--crf", type=int, default=19)
+    ap.add_argument("--crf", type=int, default=17, help="quality of the master render")
+    ap.add_argument("--bitrate", default="8M", help="video bitrate of the delivery file (two-pass)")
     ap.add_argument("--out", default=os.path.join(BUILD, "still_rolling.mp4"))
     ap.add_argument("--range", nargs=2, type=float, help="render only this time range (seconds)")
     args = ap.parse_args()
@@ -108,7 +109,22 @@ def main():
                     "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac", "-b:a", "224k", "-shortest", "-movflags", "+faststart", args.out], check=True)
     for p in parts:
         os.remove(p[2])
-    print(f"done: {args.out}  ({time.time() - t0:.0f}s)")
+    print(f"master: {args.out}  ({time.time() - t0:.0f}s)", flush=True)
+    deliver(args.out, args.bitrate)
+    print(f"done: {args.out.replace('.mp4', '_web.mp4')}  ({time.time() - t0:.0f}s)")
+
+
+def deliver(master, bitrate):
+    """Two-pass x264 encode of the master to a shareable size."""
+    out = master.replace(".mp4", "_web.mp4")
+    log = os.path.join(BUILD, "x264pass")
+    common = ["-c:v", "libx264", "-preset", "slow", "-tune", "film", "-b:v", bitrate,
+              "-maxrate", str(int(bitrate.rstrip("M")) * 2) + "M", "-bufsize", str(int(bitrate.rstrip("M")) * 4) + "M",
+              "-pix_fmt", "yuv420p", "-passlogfile", log]
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", master, *common, "-pass", "1", "-an", "-f", "null", "-"],
+                   check=True)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", master, *common, "-pass", "2", "-c:a", "copy",
+                    "-movflags", "+faststart", out], check=True)
 
 
 if __name__ == "__main__":
