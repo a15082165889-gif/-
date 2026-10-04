@@ -391,7 +391,7 @@ def transition_sfx(kind):
 
 def make_sfx(name, length=None):
     if name == "chant":
-        return chant_track()
+        return chant_track(cycles=4)
     if name == "impact":
         x = impact()
     elif name == "boom":

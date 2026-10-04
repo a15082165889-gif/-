@@ -556,5 +556,68 @@
   "dur": 6.57,
   "fps": "30000/1001",
   "audio": true
+ },
+ "dive_slow": {
+  "cls": "springboard diving",
+  "file": "SSWH4_SJBrk_000021_000031.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 9.12,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "dive_london": {
+  "cls": "springboard diving",
+  "file": "Sq-X4d9YfpQ_000052_000062.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 10.02,
+  "fps": "24/1",
+  "audio": true
+ },
+ "swim_race": {
+  "cls": "swimming front crawl",
+  "file": "Io2W9GymT4I_000036_000046.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "25/1",
+  "audio": true
+ },
+ "swim_under": {
+  "cls": "swimming front crawl",
+  "file": "IYZCivlYm60_000048_000058.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 10.0,
+  "fps": "25/1",
+  "audio": true
+ },
+ "swim_crawl": {
+  "cls": "swimming front crawl",
+  "file": "I4VyM2567fU_000006_000016.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "30/1",
+  "audio": true
+ },
+ "lift_bj": {
+  "cls": "snatch weight lifting",
+  "file": "6EU9p5P7tKk_000320_000330.mp4",
+  "w": 320,
+  "h": 240,
+  "dur": 10.0,
+  "fps": "25/1",
+  "audio": true
+ },
+ "volley": {
+  "cls": "playing volleyball",
+  "file": "IYyBsJGFe3Y_000161_000171.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "25/1",
+  "audio": true
  }
 }

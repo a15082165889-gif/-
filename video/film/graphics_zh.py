@@ -720,3 +720,80 @@ def chant(ctx, t, dur, cycles=3):
             p = (1 - d / 0.25) ** 2
             rad(ctx, W / 2, H / 2, W * 0.75, [(0, RED, 0.0), (0.65, RED, 0.0), (1, RED, 0.6 * p)])
             ctx.paint()
+
+
+
+def _medal_icon(ctx, x, y, r, a, t, ph):
+    ctx.set_source_rgba(0.75, 0.1, 0.1, a)
+    ctx.move_to(x - r * 0.5, y - r * 2.0); ctx.line_to(x - r * 0.15, y - r * 0.8)
+    ctx.line_to(x + r * 0.15, y - r * 0.8); ctx.line_to(x + r * 0.5, y - r * 2.0); ctx.close_path(); ctx.fill()
+    rad(ctx, x - r * 0.3, y - r * 0.35, r * 1.4, [(0, hexc("#fff3b0"), a), (0.5, hexc("#f2b632"), a),
+                                                 (1, hexc("#8a5a10"), a)])
+    ctx.arc(x, y, r, 0, TAU); ctx.fill()
+    sw = (t * 0.8 + ph) % 2.0
+    if sw < 1:
+        glow(ctx, x - r + sw * 2 * r, y - r * 0.4, r * 0.6, (1, 1, 1), 0.5 * a)
+
+
+def gold(ctx, t, dur, n=1, label="金牌"):
+    """Gold medals pouring in + a big counting number."""
+    a = env(t, dur, 0.2, 0.4)
+    rad(ctx, W * 0.72, H * 0.42, W * 0.45, [(0, (0, 0, 0), 0.55 * a), (1, (0, 0, 0), 0)])
+    ctx.paint()
+    if n == 1:
+        k = ease_out_back(remap(t, 0, 0.6), 1.8)
+        rays(ctx, t, dur, x=W * 0.72, y=H * 0.40, strength=0.9, color=(1, 0.85, 0.4))
+        _medal_icon(ctx, W * 0.72, H * 0.42, 120 * lerp(0.4, 1, k), a, t, 0)
+        fx_text(ctx, "金", W * 0.72, H * 0.42, 110, t, "red", "serif", 900, alpha=a, slam=False, shine=False)
+        shockwave(ctx, W * 0.72, H * 0.42, t, 700, GOLD, 10)
+        sparks_burst(ctx, W * 0.72, H * 0.42, t, 44, 1100)
+        return
+    cols = 12 if n > 20 else 8
+    r = 15 if n > 20 else 20
+    x0, y0 = W * 0.72 - (cols - 1) * r * 1.25, H * 0.66
+    shown = int(n * ease_out(remap(t, 0, 1.6)))
+    for i in range(shown):
+        cx, row = i % cols, i // cols
+        ti = t - i * (1.6 / n)
+        drop = (1 - ease_out(remap(ti, 0, 0.3))) * 260
+        _medal_icon(ctx, x0 + cx * r * 2.5, y0 - row * r * 2.9 - drop, r, a * smooth(remap(ti, 0, 0.1)), t, i * 0.37)
+    v = max(1, shown)
+    fx_text(ctx, str(v), W * 0.60, H * 0.27, 210, t + 10, "gold", "bebas", 400, tracking=0.04, alpha=a,
+            slam=False)
+    if shown == n:
+        shockwave(ctx, W * 0.60, H * 0.27, t - 1.6, 800, GOLD, 12)
+        sparks_burst(ctx, W * 0.60, H * 0.27, t - 1.6, 48, 1200)
+    text(ctx, label, W * 0.60 + 170, H * 0.27 + 50, 56, "serif", 900, CREAM, a, "lm", shadow=0.8)
+
+
+def versus(ctx, t, dur):
+    """Left: China's Olympic golds. Right: men's football at the World Cup."""
+    a = env(t, dur, 0.3, 0.5)
+    ctx.set_source_rgba(0, 0, 0, 0.5 * a)
+    ctx.paint()
+    k = ease_out(remap(t, 0, 0.6))
+    # divider
+    ctx.set_source_rgba(*RED, a)
+    ctx.rectangle(W / 2 - 2, H * 0.18, 4, H * 0.56 * k)
+    ctx.fill()
+    lx, rx = W * 0.27, W * 0.73
+    text(ctx, "中国体育", lx, H * 0.22, 40, "sans", 900, GOLD, a, "mm", tracking=0.3, shadow=0.8)
+    rows = [("奥运金牌（夏季）", "300+"), ("跳水 · 巴黎", "8 / 8"), ("乒乓球 · 巴黎", "5 / 5")]
+    for i, (lab, val) in enumerate(rows):
+        ti = t - 0.3 - i * 0.35
+        if ti < 0:
+            continue
+        y = H * 0.36 + i * 120
+        text(ctx, lab, lx - 220, y, 34, "sans", 700, CREAM, a * smooth(remap(ti, 0, 0.2)), "lm", shadow=0.8)
+        fx_text(ctx, val, lx + 230, y, 86, ti, "gold", "bebas", 400, anchor="r", alpha=a, depth=4)
+    text(ctx, "中国男足", rx, H * 0.22, 40, "sans", 900, (0.75, 0.8, 0.85), a, "mm", tracking=0.3, shadow=0.8)
+    rows = [("世界杯参赛", "1 次"), ("世界杯进球", "0"), ("世界杯胜场", "0")]
+    for i, (lab, val) in enumerate(rows):
+        ti = t - 1.4 - i * 0.35
+        if ti < 0:
+            continue
+        y = H * 0.36 + i * 120
+        text(ctx, lab, rx - 220, y, 34, "sans", 700, CREAM, a * smooth(remap(ti, 0, 0.2)), "lm", shadow=0.8)
+        fx_text(ctx, val, rx + 230, y, 86, ti, "silver", "bebas" if val.isascii() else "serif", 400 if val.isascii() else 900,
+                anchor="r", alpha=a, depth=4)
+        shockwave(ctx, rx + 160, y, ti, 260, (0.7, 0.8, 0.9), 5)

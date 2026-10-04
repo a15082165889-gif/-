@@ -11,7 +11,7 @@ P = 0.07  # punch-in on hard cuts
 
 
 def card(num, title, years, upto, tone="dark", music=None, upfrom=None):
-    return dict(id="card", min=3.4, xf=0.0, tin="zoom", segs=[dict(kind="bg", tone=tone)], look=dict(grain=0.03),
+    return dict(id="card", min=4.2, xf=0.0, tin="zoom", segs=[dict(kind="bg", tone=tone)], look=dict(grain=0.03),
                 overlays=[("zh_card", 0, "end", dict(num=num, title=title, years=years,
                                                      upto_from=upfrom or upto - 3, upto_to=upto)),
                           ("streak", 0.0, 0.7, {}), ("embers", 0, "end", dict(n=30, strength=0.6))],
@@ -34,7 +34,13 @@ SHOTS = [
          events=[("o2.end+0.15", "riser:2.5", 0.7), ("o2.end+0.15", "impact", 1.0)]),
 
     # ------------------------------------------------------------------ 一 梦起
-    card("第一章", "梦起", "1982 — 1985", 1985.5, music="tension", upfrom=1980),
+    card("第一章", "梦起", "1957 — 1985", 1985.5, music="tension", upfrom=1980),
+    dict(id="a0", lines=["a0"], lead=0.3, tail=1.0,
+         segs=[S("bw_match", 7.4, 9.8, look=BW, zoom=(1.02, 1.1)),
+               S("bw_crowd", 5.0, 7.4, look=BW, punch=P),
+               S("night_dirt", 0.0, fill=True, look=OLD, zoom=(1.0, 1.08))],
+         overlays=[HL("a0+0.2", 1957, "第一次踏上世界杯预选赛")],
+         events=[("a0+0.2", "impact", 0.7)]),
     dict(id="a1", lines=["a1"], lead=0.3, tail=1.0,
          segs=[S("bw_match", 0.0, 3.6, speed=0.8, look=BW, zoom=(1.02, 1.1)),
                S("night_dirt", 0.5, fill=True, look=OLD, zoom=(1.0, 1.08), punch=P)],
@@ -82,11 +88,16 @@ SHOTS = [
                S("stadium_crowd", 0.0, fill=True, speed=0.7, look=dict(HYPE, sat=0.7), zoom=(1.0, 1.08))],
          overlays=[HL("c3+0.2", 2002, "韩日世界杯", note="3战全负 · 0进球 · 失9球")],
          events=[("c3+0.2", "impact", 0.6)]),
-    dict(id="c4", lines=["c4"], lead=0.2, tail=1.4,
+    dict(id="c4", lines=["c4"], lead=0.2, tail=0.8, look=GLORY,
+         segs=[S("pen_kick", 0.0, 1.6, speed=0.7, look=HYPE), S("keeper_dive", 4.0, 5.4, speed=0.5, punch=P),
+               S("crowd_sea", 3.0, fill=True, zoom=(1.0, 1.08))],
+         overlays=[HL("c4+0.2", 2004, "亚洲杯半决赛 · 北京", note="点球大战  淘汰伊朗")],
+         events=[("c4+0.2", "impact", 0.7), ("c4.end-0.6", "crowd_roar", 0.5)]),
+    dict(id="c5", lines=["c5"], lead=0.2, tail=1.4,
          segs=[S("bcast_ucl", 0.0, 3.0, look=HYPE, punch=P, zoom=(1.36, 1.42), focus=(0.42, 0.45)), S("red_hug", 5.0, 9.4, look=HYPE, punch=P, zoom=(1.3, 1.36), focus=(0.5, 0.4)),
                S("sad_man", 6.0, fill=True, look=COLD)],
-         overlays=[HL("c4+0.2", 2004, "亚洲杯决赛 · 北京工人体育场", "中国", 1, 3, "日本")],
-         events=[("c4+0.2", "impact", 0.7)]),
+         overlays=[HL("c5+0.2", 2004, "亚洲杯决赛 · 北京工人体育场", "中国", 1, 3, "日本")],
+         events=[("c5+0.2", "impact", 0.7)]),
 
     # ------------------------------------------------------------------ 四 坠落
     card("第四章", "坠落", "2009 — 2013", 2013.5, tone="cold", music="dark", upfrom=2005),
@@ -108,12 +119,29 @@ SHOTS = [
                S("freekick", 4.0, 6.2, punch=P, zoom=(1.28, 1.32), focus=(0.45, 0.45)), S("stadium_crowd", 0.0, fill=True, zoom=(1.0, 1.08))],
          overlays=[HL("e1+0.2", "2013 · 2015", "广州恒大 · 两夺亚冠")],
          events=[("e1+0.2", "impact", 0.6)]),
+    dict(id="e0", lines=["e0"], lead=0.2, tail=0.8, look=HYPE,
+         segs=[S("bcast_wide", 5.2, 7.6, punch=P), S("fist_stand", 3.6, 5.6, punch=P),
+               S("youth_match", 3.0, fill=True, look=dict(HYPE, sat=0.8), zoom=(1.0, 1.06))],
+         overlays=[HL("e0+0.2", 2015, "亚洲杯 · 澳大利亚", note="小组赛 3战全胜  八强止步")],
+         events=[("e0+0.2", "impact", 0.6)]),
+    dict(id="e1b", lines=["e1b"], lead=0.2, tail=1.4, look=GLORY,
+         segs=[S("stadium_lights", 0.0, 2.6, punch=P), S("crowd_sea", 4.0, 6.4, punch=P),
+               S("confetti", 3.6, fill=True, zoom=(1.0, 1.08))],
+         overlays=[HL("e1b+0.2", 2016, "3月29日 · 西安", "中国", 2, 0, "卡塔尔", until="e1b.end"),
+                   ("stamp", "e1b.end+0.05", "end", dict(text_="奇迹晋级", size=170, color="gold"))],
+         events=[("e1b+0.2", "impact", 0.7), ("e1b.end+0.05", "impact", 1.0), ("e1b.end", "crowd_roar", 0.5)]),
     dict(id="e2", lines=["e2"], lead=0.2, tail=1.2, look=HYPE,
          segs=[S("bcast_run", 0.0, 3.4, look=HYPE), S("confetti", 0.4, 2.6, punch=0.12, look=GLORY),
                S("fist_stand", 1.0, fill=True, look=GLORY)],
          overlays=[HL("e2+0.2", 2017, "3月23日 · 长沙", "中国", 1, 0, "韩国"),
                    ("flash", "e2+3.4", "e2+3.9", {})],
          events=[("e2+0.2", "impact", 0.6), ("e2+3.4", "impact", 0.9), ("e2+3.4", "crowd_roar", 0.5)]),
+
+    dict(id="e3", lines=["e3"], lead=0.2, tail=1.8, look=DESAT,
+         segs=[S("coach_two", 1.0, 3.6, punch=P), S("sad_man", 6.0, 8.4, punch=P),
+               S("lone_ball", 2.0, fill=True, speed=0.6, zoom=(1.08, 1.0))],
+         overlays=[HL("e3+1.2", 2019, "11月 · 世预赛", "中国", 1, 2, "叙利亚", note="主帅里皮当场辞职")],
+         events=[("e3", "mood:dark", 1), ("e3+1.2", "impact", 0.8)]),
 
     # ------------------------------------------------------------------ 六 崩塌
     card("第六章", "崩塌", "2021 — 2025", 2025.5, tone="cold", music="dark", upfrom=2019),
@@ -127,11 +155,10 @@ SHOTS = [
          segs=[S("bcast_keeper", 0.0, 2.3, speed=0.6, punch=P), S("sad_man", 2.0, fill=True, zoom=(1.0, 1.1))],
          overlays=[HL("f2+0.2", 2022, "大年初一", "中国", 1, 3, "越南")],
          events=[("f2+0.2", "impact", 0.8)]),
-    dict(id="f3", lines=["f3"], lead=0.2, tail=1.8, look=GLORY,
-         segs=[S("feet_dribble", 0.6, 2.4, punch=P), S("fans_german", 0.0, 2.6, punch=P, zoom=(1.4, 1.45), focus=(0.5, 0.5)),
-               S("confetti", 2.0, 4.6, punch=P), S("fans_night", 6.0, fill=True, zoom=(1.0, 1.08))],
-         overlays=[("embers", 0, "end", {}), ("leak", 0, "end", {}), HL("f3+0.2", 2022, "2月6日 · 亚洲杯决赛", "中国女足", 3, 2, "韩国", note="0比2落后  连扳三球")],
-         events=[("f3", "mood:heroic", 1), ("f3", "impact", 1.0), ("f3.end", "crowd_roar", 0.5)]),
+    dict(id="f3b", lines=["f3b"], lead=0.2, tail=1.0, look=DESAT,
+         segs=[S("bcast_keeper", 0.0, 2.3, speed=0.7, punch=P), S("far_field", 3.0, fill=True, zoom=(1.0, 1.08))],
+         overlays=[HL("f3b+0.2", 2024, "1月 · 卡塔尔亚洲杯", note="3战 0进球 · 小组出局")],
+         events=[("f3b", "mood:dark", 1), ("f3b+0.2", "impact", 0.8)]),
     dict(id="f4", lines=["f4"], lead=0.2, tail=1.2, look=DESAT,
          segs=[S("keeper_dive", 6.8, 8.6, speed=0.6, punch=P, zoom=(1.18, 1.22), focus=(0.45, 0.55)), S("bw_crowd", 5.0, 7.0, look=BW, punch=P),
                S("sad_man", 2.0, fill=True, zoom=(1.0, 1.1))],
@@ -185,6 +212,38 @@ SHOTS = [
          overlays=[HL("i1+0.3", 2026, "10月2日 · 重庆国际足球邀请赛", "中国", 0, 5, "巴勒斯坦",
                       note="此前 0比3 负新西兰")],
          events=[(0.0, "mood:none", 1), (0.6, "boom", 1.0), ("i1+0.3", "impact", 0.8)]),
+    # ---- 镜子：中国体育的高光，反衬男足
+    dict(id="k1", lines=["k1"], lead=0.4, tail=0.4, look=GLORY,
+         segs=[S("crowd_sea", 0.0, fill=True, zoom=(1.0, 1.08))],
+         overlays=[("embers", 0, "end", dict(color="gold"))],
+         events=[(0.0, "mood:anthem", 1), (0.0, "impact", 0.8)]),
+    dict(id="k2", lines=["k2"], lead=0.2, tail=0.8, look=GLORY,
+         segs=[S("hurdles", 1.0, 3.6, speed=0.8, punch=P), S("track", 3.0, fill=True, speed=0.7)],
+         overlays=[HL("k2+0.2", 2004, "雅典奥运会 · 男子110米栏", note="刘翔  12秒91  追平世界纪录"),
+                   ("gold", "k2+2.5", "end", dict(n=1, label="金牌"))],
+         events=[("k2+0.2", "impact", 0.7), ("k2+2.5", "impact", 0.9)]),
+    dict(id="k3", lines=["k3"], lead=0.2, tail=1.0, look=GLORY,
+         segs=[S("lift_bj", 4.0, 7.0, speed=0.8, punch=P), S("dive_london", 0.0, 2.6, punch=P),
+               S("pingpong", 0.4, fill=True)],
+         overlays=[HL("k3+0.2", 2008, "北京奥运会", note="金牌榜第一"),
+                   ("gold", "k3+2.0", "end", dict(n=48, label="枚金牌"))],
+         events=[("k3+0.2", "impact", 0.7), ("k3+2.0", "riser:1.0", 0.5), ("k3+2.0", "impact", 1.0)]),
+    dict(id="k4", lines=["k4"], lead=0.2, tail=0.8, look=GLORY,
+         segs=[S("dive_slow", 0.8, 5.4, speed=0.7), S("pingpong", 3.4, 6.4, punch=P),
+               S("swim_race", 3.6, 7.4, punch=P, zoom=(1.25, 1.3), focus=(0.5, 0.6)),
+               S("swim_under", 1.0, fill=True, speed=0.8)],
+         overlays=[HL("k4+0.2", 2024, "巴黎奥运会", note="跳水 8/8 · 乒乓球 5/5 · 潘展乐 46秒40"),
+                   ("gold", "k4.end-1.6", "end", dict(n=40, label="枚金牌"))],
+         events=[("k4+0.2", "impact", 0.7), ("k4.end-1.6", "impact", 1.0)]),
+    dict(id="k5", lines=["k5"], lead=0.2, tail=1.6, look=GLORY,
+         segs=[S("volley", 0.0, 2.6, punch=P), S("swim_crawl", 0.0, 3.0, speed=0.8),
+               S("fans_night", 6.0, fill=True)],
+         overlays=[("rays", 0, "end", dict(strength=1.0)), ("embers", 0, "end", dict(n=90, color="gold"))],
+         events=[("k5", "crowd_roar", 0.5)]),
+    dict(id="k6", lines=["k6", "k7"], lead=0.6, gap=0.6, tail=2.2, look=DESAT,
+         segs=[BLACK(0.6), S("lone_ball", 2.0, fill=True, speed=0.5, zoom=(1.15, 1.0))],
+         overlays=[("versus", "k6+0.2", "end", {}), ("smoke", 0, "end", dict(strength=0.3))],
+         events=[(0.0, "mood:none", 1), (0.6, "boom", 1.0), ("k6+0.2", "impact", 0.8), ("k7", "heartbeat", 0.7)]),
     dict(id="i2", lines=["i2", "i3"], lead=0.3, gap=0.6, tail=1.6, look=COLD,
          segs=[S("lone_ball", 2.0, 4.6, speed=0.6), S("far_field", 0.0, 3.0, speed=0.8),
                S("writing", 0.0, fill=True, look=dict(COLD, sat=0.3), zoom=(1.0, 1.08))],
@@ -209,16 +268,18 @@ SHOTS = [
          overlays=[("stamp", "j3+0.6", "end", dict(text_="同进退 · 共荣辱", size=120, color="gold")),
                    ("embers", 0, "end", {})],
          events=[("j3+0.6", "impact", 1.0)]),
-    dict(id="chant", min=12.6, look=GLORY,
+    dict(id="chant", min=16.6, look=GLORY,
          segs=[S("crowd_sea", 0.0, 1.0, punch=0.12), S("fist_stand", 1.0, 2.0, punch=0.12),
                S("fans_night", 6.0, 7.0, punch=0.12), S("crowd_hands", 2.0, 3.0, punch=0.12),
                S("stadium_lights", 5.0, 6.0, punch=0.12), S("confetti", 0.6, 1.6, punch=0.12),
                S("fans_stadium", 1.0, 2.0, punch=0.12), S("crowd_sea", 3.0, 4.0, punch=0.12),
                S("fist_stand", 3.0, 4.0, punch=0.12), S("fans_night", 7.4, 8.4, punch=0.12),
-               S("confetti", 2.6, 3.6, punch=0.12), S("crowd_hands", 5.0, fill=True, punch=0.12)],
-         overlays=[("chant", 0.2, 12.2, {}), ("embers", 0, "end", dict(n=90))],
+               S("confetti", 2.6, 3.6, punch=0.12), S("crowd_hands", 5.0, 6.0, punch=0.12),
+               S("stadium_lights", 6.0, 7.0, punch=0.12), S("fist_stand", 4.6, 5.6, punch=0.12),
+               S("crowd_sea", 6.0, 7.0, punch=0.12), S("fans_night", 8.4, fill=True, punch=0.12)],
+         overlays=[("chant", 0.2, 16.2, dict(cycles=4)), ("embers", 0, "end", dict(n=90))],
          events=[(0.0, "mood:none", 1), (0.2, "chant", 1.0)]
-         + [(0.2 + c * 4.0 + b, "shake", 0.6) for c in range(3) for b in (0.0, 1.0, 2.0, 2.5, 3.0, 3.25, 3.5)]),
+         + [(0.2 + c * 4.0 + b, "shake", 0.6) for c in range(4) for b in (0.0, 1.0, 2.0, 2.5, 3.0, 3.25, 3.5)]),
     dict(id="j4", lines=["j4"], lead=0.1, tail=2.2, look=GLORY,
          segs=[S("confetti", 2.0, fill=True, speed=0.7, zoom=(1.0, 1.1))],
          overlays=[("flash", 0.0, 0.5, {}), ("embers", 0, "end", {}), ("leak", 0, "end", {})],
@@ -241,7 +302,7 @@ DEFAULTS = dict(min=3.0, lead=0.3, gap=0.4, tail=1.0, xf=0.0)
 # whip / zoom / glitch / vertical whip; sombre shots get glitches and burns only.
 _HOT = ["whip", "zoom", "glitch", "whip_v", "spin", "whip", "burn", "zoom"]
 _LOW = ["glitch", "burn"]
-_LOWSHOTS = {"d1", "d2", "f1", "f2", "f4", "f5", "i1", "i2", "j1"}
+_LOWSHOTS = {"k6", "a0", "d1", "d2", "e3", "f1", "f2", "f3b", "f4", "f5", "i1", "i2", "j1"}
 _n = 0
 for _i, _sh in enumerate(SHOTS):
     if _i > 0 and SHOTS[_i - 1]["id"] == "card" and _sh["id"] != "card":
@@ -262,8 +323,8 @@ for _i, _sh in enumerate(SHOTS):
 
 
 # ------------------------------------------------------------------ atmosphere layers
-_SMOKY = {"a1", "a2", "b2", "d1", "d2", "f1", "f2", "f4", "f5", "i1", "i2", "j1"}
-_BRIGHT = {"cold", "b1", "c1", "e2", "f3", "g3", "g4", "g5", "j3", "j4", "h"}
+_SMOKY = {"a0", "a1", "a2", "b2", "d1", "d2", "e3", "f1", "f2", "f3b", "f4", "f5", "i1", "i2", "j1"}
+_BRIGHT = {"cold", "b1", "c1", "c4", "e1b", "e2", "k2", "k3", "k4", "k5", "g3", "g4", "g5", "j3", "j4", "h"}
 for _sh in SHOTS:
     ov = _sh.setdefault("overlays", [])
     if _sh["id"] in _SMOKY:
