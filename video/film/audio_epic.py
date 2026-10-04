@@ -410,6 +410,8 @@ def make_sfx(name, length=None):
 def find_song():
     import glob
     import os
+    if os.environ.get("SONG"):
+        return os.environ["SONG"]
 
     from .gfx import ROOT
     for ext in ("mp3", "m4a", "flac", "wav", "aac", "ogg"):
@@ -444,12 +446,13 @@ def song_climax(x, window=14.0):
     return float(i * 0.5)
 
 
-def song_bus(plan, total, n, climax_film, synth):
+def song_bus(plan, total, n, climax_film, synth, base=None):
     """Arrange the user's song so its climax lands on the film's climax; synth score fills any gaps."""
     path = find_song()
     x = load_song(path)
     x = x / (np.max(np.abs(x)) + 1e-9)
-    cs = song_climax(x)
+    import os
+    cs = float(os.environ["SONG_CLIMAX"]) if os.environ.get("SONG_CLIMAX") else song_climax(x)
     start = climax_film - cs  # film time where song time 0 lands
     print(f"  song: {path} (climax {cs:.1f}s -> film {climax_film:.1f}s, song starts at film {start:.1f}s)",
           flush=True)
@@ -476,8 +479,8 @@ def song_bus(plan, total, n, climax_film, synth):
         gain[i0:i1] = g
     k = int(0.6 * SR)
     gain = np.convolve(gain, np.ones(k) / k, mode="same")
-    synth_n = synth / (np.max(np.abs(synth)) + 1e-9)
-    return bus * song_on * gain + synth_n * (1 - song_on) * 0.8
+    fill = base if base is not None else synth / (np.max(np.abs(synth)) + 1e-9) * 0.8
+    return bus * song_on * gain + fill * (1 - song_on)
 
 
 def apply_cues(shots, total, n, synth):
@@ -575,7 +578,7 @@ def render(shots, total, voice, out_wav):
         mus = np.pad(mus, ((0, 0), (0, n - mus.shape[1])))
     if find_song():
         climax = next((sh.start + sh.resolve("g5.end-0.9") for sh in shots if "g5" in sh.cues), total * 0.7)
-        mus = song_bus(plan, total, n, climax, mus)
+        mus = song_bus(plan, total, n, climax, mus, base=apply_cues(shots, total, n, mus))
     else:
         mus = apply_cues(shots, total, n, mus)
     mus = mus / (np.max(np.abs(mus)) + 1e-9) * 0.55
@@ -584,7 +587,8 @@ def render(shots, total, voice, out_wav):
     env = signal.filtfilt(np.ones(win) / win, [1.0], env)
     rel = int(0.5 * SR)
     env = np.clip(signal.filtfilt(np.ones(rel) / rel, [1.0], np.clip(env / 0.08, 0, 1)) * 1.6, 0, 1)
-    duck = 1 - 0.42 * env
+    import os
+    duck = 1 - (float(os.environ.get("SONG_DUCK", "0.42")) if find_song() else 0.42) * env
     tt = np.arange(n) / SR
     mus *= np.clip((total + 0.3 - tt) / 5.0, 0, 1)
     mix = vo * 1.05 + mus * duck + fx * 0.75 + amb * (0.45 + 0.55 * duck)
