@@ -17,14 +17,17 @@ os.environ["FILM"] = "china"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ap = argparse.ArgumentParser()
-ap.add_argument("song")
+ap.add_argument("song", help="song file, or 'medley' for the MEDLEY_CUES arrangement")
 ap.add_argument("--climax", type=float, default=None)
 ap.add_argument("--tag", required=True)
 ap.add_argument("--credit", required=True)
 ap.add_argument("--duck", type=float, default=0.55)
 ap.add_argument("--bitrate", default="8M")
 args = ap.parse_args()
-os.environ["SONG"] = os.path.abspath(args.song)
+if args.song == "medley":
+    os.environ["MUSIC"] = "medley"
+else:
+    os.environ["SONG"] = os.path.abspath(args.song)
 if args.climax is not None:
     os.environ["SONG_CLIMAX"] = str(args.climax)
 os.environ["SONG_DUCK"] = str(args.duck)

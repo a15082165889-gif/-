@@ -117,3 +117,19 @@ MUSIC_CUES = [
 ]
 MUSIC_CREDITS = "音乐：Kevin MacLeod (incompetech.com)  Volatile Reaction · Egmont Overture Finale · Big Drumming · " \
                 "Strength of the Titans  CC BY 4.0"
+
+
+# Medley of songs (used when MUSIC=medley). Song files are supplied by the user in music/songs/.
+SONGS = "music/songs/"
+MEDLEY_CUES = [
+    dict(track=SONGS + "heart_of_courage.mp3", start=("cold", 0), end=("c5", "end"), src=0.0, fin=0.3, fout=1.6),
+    dict(track=LIB + "Big Drumming.mp3", start=("e1", 0), end=("e2", "end"), src=84.0, fin=0.3, fout=1.0),
+    dict(track=SONGS + "zhuimeng.mp3", start=("g1", -4.2), end=("i1", 0.6), align=(224.0, ("g5", "g5.end-0.9")),
+         fin=1.0, fout=0.4),
+    dict(track=SONGS + "heart_of_courage.mp3", start=("k1", 0), end=("k5", "end"), src=66.0, fin=0.1, fout=0.3),
+    dict(track=LIB + "Volatile Reaction.mp3", start=("j1", -4.2), end=("j3", "end"), src=30.0, fin=0.2, fout=0.1),
+    dict(track=SONGS + "zhuimeng.mp3", start=("j4", 0), end=("h", "end"), align=(315.0, ("h", "end")), fin=0.15,
+         fout=0.6),
+]
+MEDLEY_CREDITS = "音乐：Two Steps From Hell《Heart of Courage》 · GALA《追梦赤子心》 · " \
+                 "Kevin MacLeod (incompetech.com) CC BY 4.0"

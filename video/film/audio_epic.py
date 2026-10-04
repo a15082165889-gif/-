@@ -489,7 +489,7 @@ def apply_cues(shots, total, n, synth):
 
     from .gfx import ROOT
     from .project import story
-    cues = getattr(story, "MUSIC_CUES", [])
+    cues = getattr(story, "MEDLEY_CUES" if os.environ.get("MUSIC") == "medley" else "MUSIC_CUES", [])
     if not cues:
         return synth
     by_id = {}
@@ -507,7 +507,10 @@ def apply_cues(shots, total, n, synth):
     cache = {}
     for c in cues:
         t0, t1 = ft(c["start"]), ft(c["end"])
-        if "src_end_at" in c:
+        if "align" in c:
+            song_t, ref = c["align"]
+            src = song_t - (ft(ref) - t0)
+        elif "src_end_at" in c:
             trk_t, film_expr = c["src_end_at"]
             src = trk_t - (ft((c["end"][0], film_expr)) - t0)
         else:
@@ -518,7 +521,10 @@ def apply_cues(shots, total, n, synth):
             cache[path] = x / (np.max(np.abs(x)) + 1e-9)
         x = cache[path]
         i0, i1 = int(t0 * SR), min(n, int(t1 * SR))
-        s0 = int(max(0.0, src) * SR)
+        if src < 0:  # song would start before the cue: delay it instead
+            i0 += int(-src * SR)
+            src = 0.0
+        s0 = int(src * SR)
         m = min(i1 - i0, x.shape[1] - s0)
         if m <= 0:
             continue
@@ -588,7 +594,7 @@ def render(shots, total, voice, out_wav):
     rel = int(0.5 * SR)
     env = np.clip(signal.filtfilt(np.ones(rel) / rel, [1.0], np.clip(env / 0.08, 0, 1)) * 1.6, 0, 1)
     import os
-    duck = 1 - (float(os.environ.get("SONG_DUCK", "0.42")) if find_song() else 0.42) * env
+    duck = 1 - float(os.environ.get("SONG_DUCK", "0.42")) * env
     tt = np.arange(n) / SR
     mus *= np.clip((total + 0.3 - tt) / 5.0, 0, 1)
     mix = vo * 1.05 + mus * duck + fx * 0.75 + amb * (0.45 + 0.55 * duck)
