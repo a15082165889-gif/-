@@ -14,3 +14,8 @@ music/*.wav
 music/*.aac
 music/*.ogg
 music/songs/
+footage_real/*.mp4
+footage_real/*.part
+footage_real/*.m4a
+footage_real/*.log
+footage_real/*.ytdl
