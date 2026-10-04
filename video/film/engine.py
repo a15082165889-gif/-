@@ -231,7 +231,7 @@ class Reader:
         self.close()
         self.proc = subprocess.Popen(["ffmpeg", "-v", "error", "-ss", f"{idx / FPS:.4f}", "-i", self.path,
                                       "-f", "rawvideo", "-pix_fmt", "bgra", "-"], stdout=subprocess.PIPE,
-                                     bufsize=W * H * 4 * 2)
+                                     stderr=subprocess.DEVNULL, bufsize=W * H * 4 * 2)
         self.pos = idx - 1
 
     def get(self, idx):
