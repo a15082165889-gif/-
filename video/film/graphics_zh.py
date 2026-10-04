@@ -920,3 +920,112 @@ def crack(ctx, x, y, w, h, t, seed=1, color=(0.05, 0.0, 0.0)):
                 ctx.line_to(*p_)
             ctx.stroke()
     ctx.restore()
+
+
+# ------------------------------------------------------------------ CLEAN broadcast style (overrides)
+CLEAN = True
+_fx_text_orig, _brush_orig, _shock_orig, _sparks_orig = fx_text, brush, shockwave, sparks_burst
+
+
+def fx_text(ctx, s, x, y, size, t=10.0, style="gold", font="serif", weight=900, tracking=0.08, stagger=0.06,
+            anchor="m", alpha=1.0, slam=True, depth=None, shine=True):
+    """Broadcast-style headline: heavy sans, white (or accent) fill, soft shadow, mask-wipe reveal per glyph."""
+    if not CLEAN:
+        return _fx_text_orig(ctx, s, x, y, size, t, style, font, weight, tracking, stagger, anchor, alpha, slam,
+                             depth, shine)
+    if alpha <= 0.01 or not s:
+        return
+    font = "bebas" if font == "bebas" else "sans"
+    weight = 400 if font == "bebas" else 900
+    col = {"gold": (1, 1, 1), "white": (1, 1, 1), "silver": (0.86, 0.9, 0.95), "red": hexc("#ff2a2a")}[style]
+    ms = [_glyph_masks(ch, font, size, weight) for ch in s]
+    track = tracking * 0.5 * size
+    total = sum(m["w"] for m in ms) + track * (len(ms) - 1)
+    x0 = x - (total / 2 if anchor == "m" else 0 if anchor == "l" else total)
+    cx = x0
+    for i, m in enumerate(ms):
+        ti = t - i * stagger * 0.6
+        if ti < 0:
+            cx += m["w"] + track
+            continue
+        k = ease_out(remap(ti, 0, 0.28)) if slam else 1.0
+        ox, oy = cx - m["pad"], y - (m["asc"] - m["cap"] / 2) - m["pad"]
+        top = oy + m["pad"] + m["asc"] - m["cap"]
+        ctx.save()
+        # vertical mask wipe from below + slight upward travel
+        ctx.rectangle(cx - 10, top - m["cap"] * 0.35 + (1 - k) * m["cap"] * 1.2, m["w"] + 20, m["cap"] * 1.7)
+        ctx.clip()
+        ctx.translate(0, (1 - k) * m["cap"] * 0.6)
+        ctx.set_source_rgba(0, 0, 0, 0.55 * alpha)
+        ctx.mask_surface(m["glow"][0], ox + size * 0.02, oy + size * 0.04)
+        if style == "red":
+            ctx.set_source_rgba(*col, alpha)
+        else:
+            g = cairo.LinearGradient(0, top, 0, top + m["cap"])
+            g.add_color_stop_rgba(0, *col, alpha)
+            g.add_color_stop_rgba(1, col[0] * 0.86, col[1] * 0.86, col[2] * 0.86, alpha)
+            ctx.set_source(g)
+        ctx.mask_surface(m["fill"][0], ox, oy)
+        if shine and style != "red":
+            u = ((t * 0.45) % 2.4) - 0.7
+            sx = x0 + total * u
+            sg = cairo.LinearGradient(sx - size * 0.4, top, sx + size * 0.4, top + m["cap"])
+            sg.add_color_stop_rgba(0, 1, 1, 1, 0)
+            sg.add_color_stop_rgba(0.5, 1, 0.9, 0.7, 0.45 * alpha)
+            sg.add_color_stop_rgba(1, 1, 1, 1, 0)
+            ctx.set_source(sg)
+            ctx.mask_surface(m["fill"][0], ox, oy)
+        ctx.restore()
+        cx += m["w"] + track
+    # red underline that shoots out after the word lands
+    lt = t - len(s) * stagger * 0.6 - 0.1
+    if slam and lt > 0 and size >= 90:
+        lw = total * ease_out(remap(lt, 0, 0.4))
+        bx = x0 if anchor != "r" else x0 + total - lw
+        ctx.set_source_rgba(*hexc("#e0262b"), alpha)
+        ctx.rectangle(bx, y + size * 0.42, lw, max(6, size * 0.06))
+        ctx.fill()
+    return total
+
+
+def brush(ctx, x, y, t, w=980, h=150, reveal=0.35, alpha=1.0, color="#c81414"):
+    """Slanted solid red bar (replaces the ink brush)."""
+    if not CLEAN:
+        return _brush_orig(ctx, x, y, t, w, h, reveal, alpha, color)
+    k = ease_out(remap(t, 0, reveal))
+    hh = h * 0.78
+    sk = hh * 0.35
+    ctx.save()
+    ctx.set_source_rgba(*hexc("#d81e1e"), alpha)
+    ctx.move_to(x + sk, y - hh / 2)
+    ctx.line_to(x + sk + w * k, y - hh / 2)
+    ctx.line_to(x + w * k, y + hh / 2)
+    ctx.line_to(x, y + hh / 2)
+    ctx.close_path()
+    ctx.fill()
+    ctx.restore()
+
+
+def shockwave(ctx, x, y, t, r_max=700, color=GOLD, width=10):
+    if not CLEAN:
+        return _shock_orig(ctx, x, y, t, r_max, color, width)
+
+
+def sparks_burst(ctx, x, y, t, n=40, speed=900, color=GOLD):
+    if not CLEAN:
+        return _sparks_orig(ctx, x, y, t, n, speed, color)
+
+
+def crack(ctx, x, y, w, h, t, seed=1, color=(0.05, 0.0, 0.0)):
+    return None
+
+
+def zh_title(ctx, t, dur, title="大起大落", sub="中国足球  1982 — 2026"):
+    a = env(t, dur, 0.1, 1.0)
+    rad(ctx, W / 2, H / 2, W * 0.6, [(0, (0, 0, 0), 0.6 * a), (1, (0, 0, 0), 0.25 * a)])
+    ctx.paint()
+    fx_text(ctx, title, W / 2, H / 2 - 30, 200, t, "white", "sans", 900, tracking=0.12, stagger=0.1, alpha=a)
+    a2 = env(t - 0.9, dur - 0.9, 0.4, 1.0)
+    brush(ctx, W / 2 - 300, H / 2 + 120, t - 0.9, 600, 70, alpha=a2)
+    text(ctx, sub, W / 2, H / 2 + 120, 38, "sans", 900, (1, 1, 1), a2, "mm", tracking=0.35)
+    flare(ctx, t, dur, x=W / 2 + 420 - t * 40, y=H / 2 - 110, strength=0.6)
