@@ -407,6 +407,79 @@ def make_sfx(name, length=None):
     return np.stack([x, x])
 
 
+def find_song():
+    import glob
+    import os
+
+    from .gfx import ROOT
+    for ext in ("mp3", "m4a", "flac", "wav", "aac", "ogg"):
+        hits = sorted(glob.glob(os.path.join(ROOT, "music", f"*.{ext}")))
+        if hits:
+            return hits[0]
+    return None
+
+
+def load_song(path):
+    import subprocess
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-ac", "2", "-ar", str(SR), "-f", "f32le", "-"],
+                         capture_output=True, check=True).stdout
+    return np.frombuffer(raw, np.float32).reshape(-1, 2).T.astype(np.float64)
+
+
+def song_climax(x, window=14.0):
+    """Start time of the loudest sustained passage (usually the last big chorus)."""
+    mono = np.abs(x).mean(axis=0)
+    hop = int(0.5 * SR)
+    e = np.array([np.sqrt(np.mean(mono[i:i + hop] ** 2)) for i in range(0, len(mono) - hop, hop)])
+    w = int(window / 0.5)
+    if len(e) <= w:
+        return 0.0
+    sm = np.convolve(e, np.ones(w) / w, mode="valid")
+    # prefer choruses in the second half of the song, and the start of that loud plateau
+    sc = sm * np.linspace(0.92, 1.0, len(sm))
+    best = int(np.argmax(sc))
+    i = best
+    while i > 0 and sc[i - 1] >= 0.97 * sc[best]:
+        i -= 1
+    return float(i * 0.5)
+
+
+def song_bus(plan, total, n, climax_film, synth):
+    """Arrange the user's song so its climax lands on the film's climax; synth score fills any gaps."""
+    path = find_song()
+    x = load_song(path)
+    x = x / (np.max(np.abs(x)) + 1e-9)
+    cs = song_climax(x)
+    start = climax_film - cs  # film time where song time 0 lands
+    print(f"  song: {path} (climax {cs:.1f}s -> film {climax_film:.1f}s, song starts at film {start:.1f}s)",
+          flush=True)
+    bus = np.zeros((2, n))
+    a = max(0, int(start * SR))
+    b = max(0, int(-start * SR))
+    m = min(n - a, x.shape[1] - b)
+    bus[:, a:a + m] = x[:, b:b + m]
+    t = np.arange(n) / SR
+    song_on = np.zeros(n)
+    song_on[a:a + m] = 1.0
+    fade = int(1.5 * SR)
+    if a > 0:
+        song_on[a:a + fade] = np.linspace(0, 1, min(fade, m))
+    end = a + m
+    if end < n:
+        song_on[max(a, end - fade):end] = np.linspace(1, 0, end - max(a, end - fade))
+    # gain automation from the mood plan: dip the song in silent / sombre / chant passages
+    gain = np.ones(n)
+    for i, (t0, mood, _f) in enumerate(plan):
+        t1 = plan[i + 1][0] if i + 1 < len(plan) else total
+        g = {"none": 0.12, "sad": 0.45, "dark": 0.7}.get(mood, 1.0)
+        i0, i1 = int(t0 * SR), min(n, int(t1 * SR))
+        gain[i0:i1] = g
+    k = int(0.6 * SR)
+    gain = np.convolve(gain, np.ones(k) / k, mode="same")
+    synth_n = synth / (np.max(np.abs(synth)) + 1e-9)
+    return bus * song_on * gain + synth_n * (1 - song_on) * 0.8
+
+
 def render(shots, total, voice, out_wav):
     import soundfile as sf
     n = int((total + 1) * SR)
@@ -445,6 +518,9 @@ def render(shots, total, voice, out_wav):
     mus = music_track(plan, total)[:, :n]
     if mus.shape[1] < n:
         mus = np.pad(mus, ((0, 0), (0, n - mus.shape[1])))
+    if find_song():
+        climax = next((sh.start + sh.resolve("g5.end-0.9") for sh in shots if "g5" in sh.cues), total * 0.7)
+        mus = song_bus(plan, total, n, climax, mus)
     mus = mus / (np.max(np.abs(mus)) + 1e-9) * 0.55
     env = np.abs(vo[0])
     win = int(0.05 * SR)

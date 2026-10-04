@@ -6,3 +6,9 @@ __pycache__/
 *.mp4
 output/
 assets/fonts/Noto*.ttf
+music/*.mp3
+music/*.m4a
+music/*.flac
+music/*.wav
+music/*.aac
+music/*.ogg

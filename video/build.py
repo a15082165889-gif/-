@@ -63,6 +63,7 @@ def main():
     ap.add_argument("--bitrate", default="8M", help="video bitrate of the delivery file (two-pass)")
     ap.add_argument("--out", default=None)
     ap.add_argument("--range", nargs=2, type=float, help="render only this time range (seconds)")
+    ap.add_argument("--remix", action="store_true", help="re-mix the sound only and re-mux onto the existing master")
     args = ap.parse_args()
     from film.project import NAME
     args.out = args.out or os.path.join(BUILD, f"{NAME}.mp4")
@@ -110,6 +111,17 @@ def main():
     wav = os.path.join(BUILD, "mix.wav")
     audio.render(shots, total, voice, wav)
     engine.write_srt(engine.build_subtitles(shots, voice), args.out.replace(".mp4", ".srt"))
+
+    if args.remix:
+        out = args.out.replace(".mp4", "_remix.mp4")
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", args.out, "-i", wav, "-map", "0:v", "-map", "1:a",
+                        "-c:v", "copy", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac",
+                        "-b:a", "224k", "-shortest", "-movflags", "+faststart", out], check=True)
+        os.replace(out, args.out)
+        print(f"master re-mixed: {args.out}", flush=True)
+        deliver(args.out, args.bitrate)
+        print(f"done: {args.out.replace('.mp4', '_web.mp4')}  ({time.time() - t0:.0f}s)")
+        return
 
     print(f"picture: {total:.1f}s, {int(total * FPS)} frames", flush=True)
     f_start, f_end = 0, int(round(total * FPS))
