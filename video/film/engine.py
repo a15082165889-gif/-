@@ -283,6 +283,8 @@ class Renderer:
         self.frame_surf = None
         self.small = cairo.ImageSurface(cairo.FORMAT_ARGB32, W // 8, H // 8)
         self.subs = build_subtitles(shots, voice)
+        self.trans = transitions(shots)
+        self.tsurf = None
         self.hits = sorted(sh.start + (sh.resolve(t) if isinstance(t, str) else t)
                            for sh in shots for t, name, g in sh.events
                            if name in ("impact", "boom", "shake") and g >= 0.6)
@@ -488,6 +490,7 @@ class Renderer:
             self.draw_shot(layer, sh, T - sh.start)
             ctx.set_source_surface(layer, 0, 0)
             ctx.paint_with_alpha(a)
+        apply_transition(self, out, T)
         self.hit_fx(out, T)
         ctx = cairo.Context(out)
         # final fade from/to black
@@ -628,3 +631,116 @@ def render_chunk(args):
     enc.wait()
     r.close()
     return out_path
+
+
+# ------------------------------------------------------------------ "million-dollar" transitions
+TRANS_HALF = {"zoom": 0.28, "whip": 0.22, "whip_v": 0.22, "spin": 0.32, "glitch": 0.2, "burn": 0.3}
+
+
+def transitions(shots):
+    """All cut points with a transition: [(time, kind)]."""
+    out = []
+    for i, sh in enumerate(shots):
+        k = sh.spec.get("tin")
+        if k and i > 0:
+            out.append((sh.start + shots[i - 1].xf / 2 if shots[i - 1].xf else sh.start, k))
+        for j, s in enumerate(sh.segs):
+            k = s.spec.get("tin")
+            if k and j > 0:
+                out.append((sh.start + s.t0, k))
+    return sorted(out)
+
+
+def _accum(dst, src_surf, transforms, alpha_total=1.0):
+    """Paint src through several transforms, averaged (motion blur)."""
+    c = cairo.Context(dst)
+    c.set_source_rgb(0, 0, 0)
+    c.paint()
+    n = len(transforms)
+    for i, m in enumerate(transforms):
+        c.save()
+        c.set_matrix(m)
+        c.set_source_surface(src_surf, 0, 0)
+        c.get_source().set_extend(cairo.EXTEND_REFLECT)
+        c.get_source().set_filter(cairo.FILTER_BILINEAR)
+        c.paint_with_alpha(1.0 / (i + 1))  # running average
+        c.restore()
+    return dst
+
+
+def _mat(scale=1.0, rot=0.0, dx=0.0, dy=0.0):
+    m = cairo.Matrix()
+    m.translate(W / 2 + dx, H / 2 + dy)
+    m.rotate(rot)
+    m.scale(scale, scale)
+    m.translate(-W / 2, -H / 2)
+    return m
+
+
+def apply_transition(renderer, surf, T):
+    tr = renderer.trans
+    if not tr:
+        return
+    best = None
+    for c, k in tr:
+        h = TRANS_HALF[k]
+        if c - h <= T < c + h:
+            best = (c, k, h)
+            break
+    if not best:
+        return
+    c, k, h = best
+    p = (T - c) / h  # -1..0 before the cut, 0..1 after
+    e = (1 - abs(p)) ** 2  # strength peaks at the cut
+    side = -1 if p < 0 else 1
+    surf.flush()
+    if renderer.tsurf is None:
+        renderer.tsurf = new_surface()
+    tmp = renderer.tsurf
+    tc = cairo.Context(tmp)
+    tc.set_source_surface(surf, 0, 0)
+    tc.set_operator(cairo.OPERATOR_SOURCE)
+    tc.paint()
+    n = 14
+    if k == "zoom":
+        base = 1 + (1.1 * e if p < 0 else 0.9 * e)
+        ms = [_mat(base * (1 + 0.12 * e * i / n)) for i in range(n)]
+        _accum(surf, tmp, ms)
+    elif k in ("whip", "whip_v"):
+        d = W * 0.9 * e * (-1 if p < 0 else 1)
+        if k == "whip":
+            ms = [_mat(1.0, 0, d - side * W * 0.018 * e * i, 0) for i in range(n)]
+        else:
+            ms = [_mat(1.0, 0, 0, d * H / W - side * H * 0.022 * e * i) for i in range(n)]
+        _accum(surf, tmp, ms)
+    elif k == "spin":
+        ang = 0.9 * e * (1 if p < 0 else -1)
+        sc = 1 + 0.7 * e
+        ms = [_mat(sc * (1 + 0.03 * e * i), ang + 0.05 * e * i * (1 if p < 0 else -1)) for i in range(n)]
+        _accum(surf, tmp, ms)
+    elif k == "glitch":
+        f = as_array(surf)
+        src = f.copy()
+        g = np.random.default_rng(int(T * 1000))
+        y = 0
+        while y < H:
+            bh = int(g.integers(8, 90))
+            sh = int(g.normal(0, 140 * e))
+            f[y:y + bh] = np.roll(src[y:y + bh], sh, axis=1)
+            y += bh
+        sp = int(26 * e)
+        if sp:
+            f[..., 2] = np.roll(f[..., 2], sp, axis=1)
+            f[..., 0] = np.roll(f[..., 0], -sp, axis=1)
+        if e > 0.6:
+            f[..., :3] = np.clip(f[..., :3].astype(np.int16) + g.integers(-40, 40, (H, W, 1)), 0, 255)
+        surf.mark_dirty()
+    elif k == "burn":
+        ms = [_mat(1 + 0.25 * e * (1 + 0.04 * i)) for i in range(4)]
+        _accum(surf, tmp, ms)
+        bc = cairo.Context(surf)
+        bc.set_operator(cairo.OPERATOR_ADD)
+        gx.rad(bc, W * 0.5, H * 0.5, W * 0.8, [(0, (1, 0.85, 0.6), 0.95 * e), (0.5, (1, 0.45, 0.15), 0.6 * e),
+                                                (1, (0.6, 0.1, 0.05), 0.2 * e)])
+        bc.paint()
+    surf.mark_dirty()

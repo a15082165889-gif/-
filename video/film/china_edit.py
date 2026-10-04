@@ -11,7 +11,7 @@ P = 0.07  # punch-in on hard cuts
 
 
 def card(num, title, years, upto, tone="dark", music=None, upfrom=None):
-    return dict(id="card", min=3.4, xf=0.3, segs=[dict(kind="bg", tone=tone)], look=dict(grain=0.03),
+    return dict(id="card", min=3.4, xf=0.0, tin="zoom", segs=[dict(kind="bg", tone=tone)], look=dict(grain=0.03),
                 overlays=[("zh_card", 0, "end", dict(num=num, title=title, years=years,
                                                      upto_from=upfrom or upto - 3, upto_to=upto)),
                           ("streak", 0.0, 0.7, {}), ("embers", 0, "end", dict(n=30, strength=0.6))],
@@ -234,3 +234,40 @@ SHOTS = [
 ]
 
 DEFAULTS = dict(min=3.0, lead=0.3, gap=0.4, tail=1.0, xf=0.0)
+
+
+# ------------------------------------------------------------------ transitions ("百万级转场")
+# The shot after each chapter card enters with a spin or a light burn; montage cuts cycle through
+# whip / zoom / glitch / vertical whip; sombre shots get glitches and burns only.
+_HOT = ["whip", "zoom", "glitch", "whip_v", "spin", "whip", "burn", "zoom"]
+_LOW = ["glitch", "burn"]
+_LOWSHOTS = {"d1", "d2", "f1", "f2", "f4", "f5", "i1", "i2", "j1"}
+_n = 0
+for _i, _sh in enumerate(SHOTS):
+    if _i > 0 and SHOTS[_i - 1]["id"] == "card" and _sh["id"] != "card":
+        _sh.setdefault("tin", "burn" if _sh["id"] in _LOWSHOTS else ("spin" if _n % 2 else "zoom"))
+    elif _i > 0 and _sh["id"] != "card" and _sh["id"] not in ("chant",):
+        _sh.setdefault("tin", (_LOW if _sh["id"] in _LOWSHOTS else _HOT)[_n % 2 if _sh["id"] in _LOWSHOTS else _n % len(_HOT)])
+    if _sh["id"] == "chant":
+        continue  # chant cuts land on the claps with shakes; keep them hard
+    for _j, _sg in enumerate(_sh.get("segs", [])):
+        if _j == 0 or _sg.get("kind") in ("black", "bg"):
+            continue
+        if _sh["id"] in _LOWSHOTS:
+            _sg.setdefault("tin", _LOW[_n % 2])
+        else:
+            _sg.setdefault("tin", _HOT[_n % len(_HOT)])
+        _n += 1
+    _n += 1
+
+
+# ------------------------------------------------------------------ atmosphere layers
+_SMOKY = {"a1", "a2", "b2", "d1", "d2", "f1", "f2", "f4", "f5", "i1", "i2", "j1"}
+_BRIGHT = {"cold", "b1", "c1", "e2", "f3", "g3", "g4", "g5", "j3", "j4", "h"}
+for _sh in SHOTS:
+    ov = _sh.setdefault("overlays", [])
+    if _sh["id"] in _SMOKY:
+        ov.insert(0, ("smoke", 0, "end", dict(strength=0.28)))
+    if _sh["id"] in _BRIGHT:
+        ov.insert(0, ("rays", 0, "end", dict(strength=0.8)))
+        ov.insert(1, ("flare", 0, "end", dict(strength=0.7)))

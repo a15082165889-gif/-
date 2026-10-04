@@ -82,177 +82,12 @@ def ecg(ctx, t, upto, box, alpha=1.0, labels=True, head_glow=True):
         ctx.fill()
 
 
-def zh_card(ctx, t, dur, num, title, years, upto_from, upto_to):
-    a = env(t, dur, 0.25, 0.3)
-    box = (180, H * 0.60, W - 360, 220)
-    upto = lerp(upto_from, upto_to, ease_in_out(remap(t, 0.2, dur - 0.5)))
-    ecg(ctx, t, upto, box, 0.85 * a)
-    k = ease_out_back(remap(t, 0.0, 0.5), 2.2)
-    s = lerp(1.25, 1.0, k)
-    text(ctx, num, W / 2, H * 0.24, 30, "sans", 600, GOLD, a, "mm", tracking=0.6)
-    ctx.save()
-    ctx.translate(W / 2, H * 0.37)
-    ctx.scale(s, s)
-    text(ctx, title, 0, 0, 132, "serif", 900, CREAM, a, "mm", tracking=0.2, shadow=0.7, shadow_blur=18,
-         glow_c=RED, glow_a=0.35)
-    ctx.restore()
-    text(ctx, years, W / 2, H * 0.48, 40, "bebas", 400, RED, a, "mm", tracking=0.35)
 
 
-def zh_title(ctx, t, dur):
-    a = env(t, dur, 0.15, 1.0)
-    k = ease_out_back(remap(t, 0, 0.6), 2.5)
-    s = lerp(1.6, 1.0, k)
-    rad(ctx, W / 2, H / 2, W * 0.6, [(0, (0, 0, 0), 0.6 * a), (1, (0, 0, 0), 0.2 * a)])
-    ctx.paint()
-    sh = 12 * (1 - remap(t, 0, 0.5))
-    ctx.save()
-    ctx.translate(W / 2 + math.sin(t * 90) * sh, H / 2 - 30 + math.cos(t * 77) * sh)
-    ctx.scale(s, s)
-    text(ctx, "大起大落", 0, 0, 230, "serif", 900, CREAM, a, "mm", tracking=0.12, shadow=0.8, shadow_blur=24,
-         glow_c=RED, glow_a=0.5)
-    ctx.restore()
-    a2 = env(t - 0.6, dur - 0.6, 0.6, 1.0)
-    lw = 520 * ease_in_out(remap(t, 0.5, 1.4))
-    ctx.set_source_rgba(*RED, a2)
-    ctx.rectangle(W / 2 - lw / 2, H / 2 + 110, lw, 4)
-    ctx.fill()
-    text(ctx, "中国足球  1982 — 2026", W / 2, H / 2 + 160, 40, "sans", 600, GOLD, a2, "mm", tracking=0.4)
 
 
-def headline(ctx, t, dur, year, place, home="", hs="", as_="", away="", note=""):
-    """Big year + place, and an optional scoreboard, in the lower-left."""
-    a = env(t, dur, 0.2, 0.35)
-    k = ease_out(remap(t, 0, 0.45))
-    x = 130 - 80 * (1 - k)
-    y = H - BAR - 330
-    lin(ctx, 0, 0, 1300, 0, [(0, (0, 0, 0), 0.7 * a), (0.6, (0, 0, 0), 0.35 * a), (1, (0, 0, 0), 0)])
-    ctx.rectangle(0, y - 120, 1300, 330)
-    ctx.fill()
-    ctx.set_source_rgba(*RED, a)
-    ctx.rectangle(x - 34, y - 92, 10, 250 * k)
-    ctx.fill()
-    text(ctx, str(year), x, y - 30, 128, "bebas", 400, RED, a, "lm", tracking=0.04, shadow=0.6)
-    text(ctx, place, x + 6, y + 50, 40, "sans", 600, CREAM, a, "lm", tracking=0.12, shadow=0.6)
-    if home:
-        a2 = env(t - 0.35, dur - 0.35, 0.25, 0.35)
-        k2 = ease_out_back(remap(t, 0.35, 0.8), 2.0)
-        yy = y + 128
-        text(ctx, home, x + 6, yy, 46, "sans", 700, CREAM, a2, "lm")
-        hw = 46 * len(home) + 30
-        sc = f"{hs} : {as_}"
-        ctx.save()
-        ctx.translate(x + hw + 90, yy)
-        ctx.scale(lerp(1.5, 1.0, k2), lerp(1.5, 1.0, k2))
-        text(ctx, sc, 0, 0, 84, "bebas", 400, GOLD, a2, "mm", tracking=0.05, shadow=0.6)
-        ctx.restore()
-        text(ctx, away, x + hw + 190, yy, 46, "sans", 700, CREAM, a2, "lm")
-    if note:
-        a3 = env(t - 0.6, dur - 0.6, 0.3, 0.35)
-        text(ctx, note, x + 6, y + 190 if home else y + 110, 30, "sans", 500, GOLD, a3, "lm", tracking=0.1)
 
 
-def stamp(ctx, t, dur, text_, size=150, color="red", sub=""):
-    """Centre-screen impact text that slams in."""
-    a = env(t, dur, 0.08, 0.4)
-    k = ease_out_back(remap(t, 0, 0.35), 2.8)
-    s = lerp(2.2, 1.0, k)
-    rad(ctx, W / 2, H / 2, W * 0.55, [(0, (0, 0, 0), 0.55 * a), (1, (0, 0, 0), 0.15 * a)])
-    ctx.paint()
-    c = {"red": RED, "gold": GOLD, "cream": CREAM}[color]
-    sh = 16 * (1 - remap(t, 0.0, 0.4))
-    ctx.save()
-    ctx.translate(W / 2 + math.sin(t * 97) * sh, H / 2 - 20 + math.cos(t * 83) * sh)
-    ctx.scale(s, s)
-    font = "bebas" if all(ch.isascii() for ch in text_) else "serif"
-    text(ctx, text_, 0, 0, size, font, 900, c, a, "mm", tracking=0.08, shadow=0.8, shadow_blur=20,
-         glow_c=c, glow_a=0.3)
-    ctx.restore()
-    if sub:
-        a2 = env(t - 0.3, dur - 0.3, 0.3, 0.4)
-        text(ctx, sub, W / 2, H / 2 + size * 0.62 + 20, 40, "sans", 600, CREAM, a2, "mm", tracking=0.3, shadow=0.6)
-
-
-def glitch(ctx, t, dur, words):
-    """Words flicker in like a bad signal: 假球 · 黑哨 · 赌球."""
-    a = env(t, dur, 0.1, 0.4)
-    n = len(words)
-    for i, w_ in enumerate(words):
-        ti = t - i * 0.55
-        if ti < 0:
-            continue
-        flick = 1.0 if ti > 0.3 else (0.2 if int(ti * 40) % 2 else 1.0)
-        x = W / 2 + (i - (n - 1) / 2) * 420
-        dx = (math.sin(t * 53 + i) * 6) if int(t * 7 + i) % 5 == 0 else 0
-        text(ctx, w_, x + dx + 4, H / 2 - 40, 140, "serif", 900, (0.1, 0.8, 0.9), 0.35 * a * flick, "mm")
-        text(ctx, w_, x + dx - 4, H / 2 - 40, 140, "serif", 900, RED, 0.5 * a * flick, "mm")
-        text(ctx, w_, x + dx, H / 2 - 40, 140, "serif", 900, CREAM, a * flick, "mm", shadow=0.7)
-
-
-def shootout(ctx, t, dur):
-    """Penalty shoot-out result board."""
-    a = env(t, dur, 0.3, 0.5)
-    k = ease_out(remap(t, 0, 0.5))
-    y = H * 0.22
-    lin(ctx, 0, y - 90, 0, y + 200, [(0, (0, 0, 0), 0), (0.3, (0, 0, 0), 0.6 * a), (0.7, (0, 0, 0), 0.6 * a),
-                                    (1, (0, 0, 0), 0)])
-    ctx.rectangle(0, y - 90, W, 290)
-    ctx.fill()
-    text(ctx, "点球大战", W / 2, y - 40, 34, "sans", 700, GOLD, a, "mm", tracking=0.6)
-    kk = ease_out_back(remap(t, 0.4, 0.9), 2.4)
-    ctx.save()
-    ctx.translate(W / 2, y + 60)
-    ctx.scale(lerp(1.8, 1.0, kk), lerp(1.8, 1.0, kk))
-    text(ctx, "4 : 3", 0, 0, 150, "bebas", 400, CREAM, a * smooth(remap(t, 0.4, 0.6)), "mm", tracking=0.06,
-         shadow=0.7, glow_c=RED, glow_a=0.35)
-    ctx.restore()
-    text(ctx, "中国", W / 2 - 300 * k, y + 64, 56, "sans", 800, CREAM, a, "mm")
-    text(ctx, "乌兹别克斯坦", W / 2 + 330 * k + 40, y + 64, 44, "sans", 700, CREAM, a * 0.85, "mm")
-    a3 = env(t - 1.0, dur - 1.0, 0.4, 0.5)
-    text(ctx, "门将 李昊  扑出 2 球", W / 2, y + 170, 36, "sans", 600, GOLD, a3, "mm", tracking=0.2)
-
-
-def medal(ctx, t, dur):
-    """Bronze medal with '28 年'."""
-    a = env(t, dur, 0.4, 0.8)
-    k = ease_out_back(remap(t, 0, 0.7), 1.8)
-    cx, cy, r = W * 0.72, H * 0.43, 150 * lerp(0.6, 1.0, k)
-    glow(ctx, cx, cy, r * 2.4, hexc("#d08a45"), 0.45 * a)
-    rad(ctx, cx - r * 0.3, cy - r * 0.35, r * 1.3, [(0, hexc("#f3c08a"), a), (0.55, hexc("#b8713a"), a),
-                                                     (1, hexc("#6e3d18"), a)])
-    ctx.arc(cx, cy, r, 0, TAU)
-    ctx.fill()
-    ctx.set_line_width(r * 0.06)
-    ctx.set_source_rgba(1, 0.9, 0.75, 0.5 * a)
-    ctx.arc(cx, cy, r * 0.82, 0, TAU)
-    ctx.stroke()
-    text(ctx, "铜", cx, cy, r * 0.9, "serif", 900, hexc("#5a2e10"), 0.85 * a, "mm")
-    sweep = (t * 0.5) % 1.6
-    if sweep < 1:
-        ang = -1 + sweep * 2
-        glow(ctx, cx + ang * r * 0.7, cy - ang * r * 0.4, r * 0.5, (1, 1, 1), 0.35 * a)
-    a2 = env(t - 0.5, dur - 0.5, 0.5, 0.8)
-    text(ctx, "28", W * 0.30, H * 0.40, 260, "bebas", 400, GOLD, a2, "mm", glow_c=GOLD, glow_a=0.25, shadow=0.7)
-    text(ctx, "年", W * 0.30 + 175, H * 0.40 + 70, 70, "serif", 900, CREAM, a2, "mm")
-    text(ctx, "1998 曼谷  →  2026 名古屋", W * 0.30, H * 0.40 + 170, 34, "sans", 600, CREAM, a2 * 0.9, "mm",
-         tracking=0.1)
-
-
-def zh_end(ctx, t, dur):
-    dark = 0.75 * smooth(remap(t, 0, 2.5))
-    ctx.set_source_rgba(0, 0, 0, dark)
-    ctx.paint()
-    a = env(t - 0.8, dur - 0.8, 1.2, 1.5)
-    box = (220, H * 0.60, W - 440, 170)
-    ecg(ctx, t, lerp(1982, 2026, ease_in_out(remap(t, 0.5, 5.0))), box, 0.7 * a, labels=False)
-    text(ctx, "大起大落", W / 2, H * 0.34, 170, "serif", 900, CREAM, a, "mm", tracking=0.12, glow_c=RED,
-         glow_a=0.35, shadow=0.7)
-    a2 = env(t - 2.2, dur - 2.2, 1.2, 1.5)
-    text(ctx, "致每一个，还在等待的人", W / 2, H * 0.47, 46, "sans", 600, GOLD, a2, "mm", tracking=0.3)
-    a3 = env(t - 4.0, dur - 4.0, 1.0, 1.5) * 0.5
-    for i, ln in enumerate(["画面：Kinetics-700 数据集公开视频片段（示意画面，非比赛原始影像）",
-                            "配音：Kokoro 神经网络语音  ·  配乐：本片原创合成"]):
-        text(ctx, ln, W / 2, H - BAR - 96 + i * 34, 22, "sans", 400, CREAM, a3, "mm", tracking=0.05)
 
 
 # ------------------------------------------------------------------ particles, light, transitions
@@ -322,44 +157,6 @@ def streak(ctx, t, dur):
 CHANT_CYCLE = 4.0
 CHANT_CLAPS = (2.0, 2.5, 3.0, 3.25, 3.5)
 
-
-def chant(ctx, t, dur, cycles=3):
-    """'中国队 加油!' kinetic type in time with the chant and claps."""
-    c = int(t // CHANT_CYCLE)
-    lt = t - c * CHANT_CYCLE
-    if c >= cycles:
-        return
-    big = 1.0 + 0.12 * c
-    rad(ctx, W / 2, H / 2, W * 0.6, [(0, (0, 0, 0), 0.35), (1, (0, 0, 0), 0.0)])
-    ctx.paint()
-    # 中国队
-    a1 = smooth(remap(lt, 0, 0.06)) * smooth(remap(lt, CHANT_CYCLE - 0.1, CHANT_CYCLE - 0.35))
-    k1 = ease_out_back(remap(lt, 0, 0.3), 3.0)
-    ctx.save()
-    ctx.translate(W / 2, H * 0.38)
-    s = lerp(2.4, 1.0, k1) * big
-    ctx.scale(s, s)
-    text(ctx, "中国队", 0, 0, 150, "serif", 900, CREAM, a1, "mm", tracking=0.25, shadow=0.8, shadow_blur=20,
-         glow_c=RED, glow_a=0.5)
-    ctx.restore()
-    # 加油！
-    a2 = smooth(remap(lt, 1.0, 1.06)) * smooth(remap(lt, CHANT_CYCLE - 0.1, CHANT_CYCLE - 0.35))
-    k2 = ease_out_back(remap(lt, 1.0, 1.3), 3.0)
-    if a2 > 0:
-        ctx.save()
-        ctx.translate(W / 2, H * 0.62)
-        s = lerp(2.6, 1.0, k2) * big
-        ctx.scale(s, s)
-        text(ctx, "加油！", 0, 0, 190, "serif", 900, RED, a2, "mm", tracking=0.2, shadow=0.8, shadow_blur=20,
-             glow_c=GOLD, glow_a=0.4)
-        ctx.restore()
-    # claps: red edge pulses
-    for ct in CHANT_CLAPS:
-        d = lt - ct
-        if 0 <= d < 0.25:
-            p = (1 - d / 0.25) ** 2
-            rad(ctx, W / 2, H / 2, W * 0.75, [(0, RED, 0.0), (0.65, RED, 0.0), (1, RED, 0.55 * p)])
-            ctx.paint()
 
 
 CITIES = [("北京工体", 116.4, 39.9, True), ("沈阳五里河", 123.4, 41.8, True), ("大连金州", 121.6, 38.9, True),
@@ -442,3 +239,481 @@ def china_map(ctx, t, dur):
     a = smooth(remap(t, 1.8, 2.4)) * smooth(remap(t, dur, dur - 0.3))
     text(ctx, "每一座城市，都有为国家队呐喊的声音", W / 2, BAR + 90, 36, "sans", 600, GOLD, a, "mm", tracking=0.15,
          shadow=0.7)
+
+
+# ------------------------------------------------------------------ high-impact text
+from functools import lru_cache  # noqa: E402
+
+from PIL import Image, ImageDraw, ImageFilter  # noqa: E402
+
+from .gfx import pil_font  # noqa: E402
+
+STYLES = {
+    # fill gradient (top -> bottom), outline, extrude, glow
+    "gold": dict(fill=[(0, "#fff6d0"), (0.45, "#f7c64a"), (0.55, "#c9871c"), (1, "#ffe39a")],
+                 outline="#2a0d05", extrude="#6b1a0c", glow="#ff9a2a"),
+    "red": dict(fill=[(0, "#ffd9a8"), (0.4, "#ff4a2a"), (0.6, "#c4100f"), (1, "#ff6a3a")],
+                outline="#1a0303", extrude="#4a0606", glow="#ff2a1a"),
+    "silver": dict(fill=[(0, "#ffffff"), (0.48, "#dfe6ee"), (0.55, "#8d99a8"), (1, "#f2f6fa")],
+                   outline="#05070a", extrude="#1c2430", glow="#8fc4ff"),
+    "white": dict(fill=[(0, "#ffffff"), (1, "#f3e9d6")], outline="#120606", extrude="#3a0a08", glow="#ff5a3a"),
+}
+
+
+@lru_cache(maxsize=512)
+def _glyph_masks(s, font, size, weight):
+    """(fill, outline, glow) A8 masks for one string, plus geometry."""
+    f = pil_font(font, size, weight)
+    asc, desc = f.getmetrics()
+    w = int(f.getlength(s)) + 1
+    pad = int(size * 0.35)
+    iw, ih = w + 2 * pad, asc + desc + 2 * pad
+    img = Image.new("L", (iw, ih), 0)
+    ImageDraw.Draw(img).text((pad, pad), s, font=f, fill=255, anchor="la")
+    r = max(3, int(size * 0.055)) | 1
+    out = img.filter(ImageFilter.MaxFilter(r)).filter(ImageFilter.MaxFilter(r))
+    gl = out.filter(ImageFilter.GaussianBlur(size * 0.12))
+
+    def a8(im):
+        import cairo as _c
+        stride = _c.ImageSurface.format_stride_for_width(_c.FORMAT_A8, iw)
+        buf = np.zeros((ih, stride), np.uint8)
+        buf[:, :iw] = np.asarray(im)
+        return _c.ImageSurface.create_for_data(memoryview(buf), _c.FORMAT_A8, iw, ih, stride), buf
+
+    cap = f.getbbox("国" if any(ord(ch) > 0x3000 for ch in s) else "H", anchor="ls")
+    return dict(fill=a8(img), outline=a8(out), glow=a8(gl), w=w, pad=pad, asc=asc, cap=-cap[1], iw=iw, ih=ih)
+
+
+def fx_text(ctx, s, x, y, size, t=10.0, style="gold", font="serif", weight=900, tracking=0.08, stagger=0.06,
+            anchor="m", alpha=1.0, slam=True, depth=None, shine=True):
+    """Metallic gradient text with outline, 3D extrusion, glow, light sweep and per-character slam-in."""
+    if alpha <= 0.01 or not s:
+        return
+    st = STYLES[style]
+    chars = list(s)
+    ms = [_glyph_masks(ch, font, size, weight) for ch in chars]
+    track = tracking * size
+    total = sum(m["w"] for m in ms) + track * (len(ms) - 1)
+    x0 = x - (total / 2 if anchor == "m" else 0 if anchor == "l" else total)
+    depth = int(size * 0.06) if depth is None else depth
+    cx = x0
+    for i, (ch, m) in enumerate(zip(chars, ms)):
+        ti = t - i * stagger
+        if ti < 0:
+            cx += m["w"] + track
+            continue
+        k = ease_out_back(remap(ti, 0, 0.32), 2.4) if slam else 1.0
+        sc = lerp(2.8, 1.0, k) if slam else 1.0
+        a = alpha * (smooth(remap(ti, 0, 0.07)) if slam else 1.0)
+        gx_, gy_ = cx + m["w"] / 2, y
+        ctx.save()
+        ctx.translate(gx_, gy_)
+        ctx.scale(sc, sc)
+        ox, oy = -m["w"] / 2 - m["pad"], -(m["asc"] - m["cap"] / 2) - m["pad"]
+        # glow
+        ctx.set_source_rgba(*hexc(st["glow"]), 0.55 * a)
+        ctx.mask_surface(m["glow"][0], ox, oy)
+        # 3D extrusion
+        for d in range(depth, 0, -1):
+            sh_ = 0.55 + 0.45 * (1 - d / depth)
+            c = hexc(st["extrude"])
+            ctx.set_source_rgba(c[0] * sh_, c[1] * sh_, c[2] * sh_, a)
+            ctx.mask_surface(m["outline"][0], ox + d * 0.6, oy + d)
+        # outline
+        ctx.set_source_rgba(*hexc(st["outline"]), a)
+        ctx.mask_surface(m["outline"][0], ox, oy)
+        # gradient fill
+        top, h = oy + m["pad"] + m["asc"] - m["cap"], m["cap"]
+        g = cairo.LinearGradient(0, top - h * 0.1, 0, top + h * 1.1)
+        for off, col in st["fill"]:
+            g.add_color_stop_rgba(off, *hexc(col), a)
+        ctx.set_source(g)
+        ctx.mask_surface(m["fill"][0], ox, oy)
+        # light sweep across the glyphs
+        if shine:
+            u = ((t * 0.55) % 2.2) - 0.6
+            sx = lerp(-total * 0.6, total * 0.6, u) - (gx_ - x)
+            sg = cairo.LinearGradient(sx - size * 0.5, -size, sx + size * 0.5, size)
+            sg.add_color_stop_rgba(0, 1, 1, 1, 0)
+            sg.add_color_stop_rgba(0.5, 1, 1, 1, 0.7 * a)
+            sg.add_color_stop_rgba(1, 1, 1, 1, 0)
+            ctx.set_source(sg)
+            ctx.mask_surface(m["fill"][0], ox, oy)
+        ctx.restore()
+        cx += m["w"] + track
+    return total
+
+
+def shockwave(ctx, x, y, t, r_max=700, color=GOLD, width=10):
+    """Expanding bright ring right after a slam."""
+    if t < 0 or t > 0.6:
+        return
+    u = ease_out(t / 0.6)
+    r = 40 + u * r_max
+    a = (1 - u) ** 1.5
+    ctx.save()
+    ctx.set_operator(cairo.OPERATOR_ADD)
+    for w_, aa in ((width * 4, 0.15), (width * 1.6, 0.35), (width * 0.6, 0.9)):
+        ctx.set_line_width(w_ * (1 - u * 0.6))
+        ctx.set_source_rgba(*color, aa * a)
+        ctx.arc(x, y, r, 0, TAU)
+        ctx.stroke()
+    ctx.restore()
+
+
+_BURST = np.random.default_rng(5).random((48, 3))
+
+
+def sparks_burst(ctx, x, y, t, n=40, speed=900, color=GOLD):
+    if t < 0 or t > 0.9:
+        return
+    ctx.save()
+    ctx.set_operator(cairo.OPERATOR_ADD)
+    for i in range(min(n, len(_BURST))):
+        ang, sp, ln = _BURST[i]
+        ang *= TAU
+        v = speed * (0.4 + 0.6 * sp)
+        d = v * t * (1 - 0.45 * t)
+        px, py = x + math.cos(ang) * d, y + math.sin(ang) * d + 300 * t * t
+        tail = 0.05 + 0.08 * ln
+        qx, qy = x + math.cos(ang) * max(0, d - v * tail), y + math.sin(ang) * max(0, d - v * tail) + 300 * t * t
+        a = (1 - t / 0.9) ** 1.2
+        ctx.set_line_width(3)
+        ctx.set_line_cap(1)
+        ctx.set_source_rgba(*color, a)
+        ctx.move_to(qx, qy)
+        ctx.line_to(px, py)
+        ctx.stroke()
+    ctx.restore()
+
+
+@lru_cache(maxsize=4)
+def brush_strip(w=980, h=150, seed=3, color="#c81414"):
+    """A rough red ink brush stroke (Chinese calligraphy style banner)."""
+    g = np.random.default_rng(seed)
+    img = Image.new("RGBA", (w + 80, h + 80), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    c = hexc(color)
+    col = tuple(int(v * 255) for v in c)
+    for k in range(260):
+        yy = 40 + g.normal(h / 2, h * 0.22)
+        x0 = 40 + g.uniform(-20, 60)
+        x1 = 40 + w - g.uniform(0, 160) * (abs(yy - 40 - h / 2) / (h / 2)) ** 1.5 - g.uniform(0, 40)
+        th = int(g.uniform(2, 10))
+        a = int(g.uniform(60, 160))
+        d.line([(x0, yy), (x1, yy + g.normal(0, 3))], fill=col + (a,), width=th)
+    img = img.filter(ImageFilter.GaussianBlur(1.2))
+    arr = np.asarray(img).astype(np.float32)
+    noise = g.random(arr.shape[:2]) * 0.35 + 0.75
+    arr[..., 3] = np.clip(arr[..., 3] * 1.6 * noise, 0, 255)
+    from .gfx import surface_from_pil
+    return surface_from_pil(Image.fromarray(arr.astype(np.uint8), "RGBA"))
+
+
+def brush(ctx, x, y, t, w=980, h=150, reveal=0.35, alpha=1.0, color="#c81414"):
+    s = brush_strip(w, h, 3, color)
+    k = ease_out(remap(t, 0, reveal))
+    ctx.save()
+    ctx.rectangle(x - 40, y - h / 2 - 40, (w + 80) * k, h + 80)
+    ctx.clip()
+    ctx.set_source_surface(s, x - 40, y - h / 2 - 40)
+    ctx.paint_with_alpha(alpha)
+    ctx.restore()
+
+
+# ------------------------------------------------------------------ light & atmosphere
+def flare(ctx, t, dur, x=None, y=None, strength=1.0, color=(0.55, 0.75, 1.0)):
+    """Anamorphic lens flare: long horizontal streak + ghosts."""
+    a = env(t, dur, 0.4, 0.5) * strength
+    if a <= 0:
+        return
+    x = W * (0.25 + 0.5 * ((math.sin(t * 0.35) + 1) / 2)) if x is None else x
+    y = H * 0.28 if y is None else y
+    ctx.save()
+    ctx.set_operator(cairo.OPERATOR_ADD)
+    fl = 0.85 + 0.15 * math.sin(t * 13)
+    glow(ctx, x, y, 180, (1, 0.95, 0.85), 0.55 * a * fl)
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.scale(1, 0.018)
+    rad(ctx, 0, 0, W * 0.9, [(0, color, 0.9 * a * fl), (0.3, color, 0.35 * a), (1, color, 0)])
+    ctx.arc(0, 0, W * 0.9, 0, TAU)
+    ctx.fill()
+    ctx.restore()
+    cxs, cys = W / 2, H / 2
+    for k, (f, r, col) in enumerate(((0.4, 60, (0.4, 0.9, 0.6)), (-0.3, 110, (0.9, 0.5, 1.0)),
+                                     (-0.8, 40, (1.0, 0.7, 0.3)), (-1.2, 160, (0.4, 0.6, 1.0)))):
+        gx_, gy_ = cxs + (cxs - x) * f, cys + (cys - y) * f
+        rad(ctx, gx_, gy_, r, [(0, col, 0.0), (0.7, col, 0.10 * a), (1, col, 0)])
+        ctx.arc(gx_, gy_, r, 0, TAU)
+        ctx.fill()
+    ctx.restore()
+
+
+def rays(ctx, t, dur, x=None, y=-80, strength=1.0, color=(1.0, 0.85, 0.6)):
+    """Volumetric god rays from a light above the frame."""
+    a = env(t, dur, 0.6, 0.6) * strength
+    x = W * 0.62 if x is None else x
+    ctx.save()
+    ctx.set_operator(cairo.OPERATOR_ADD)
+    g = np.random.default_rng(9)
+    for i in range(16):
+        ang = math.pi / 2 + (g.random() - 0.5) * 1.6 + math.sin(t * 0.3 + i) * 0.04
+        wdt = 0.02 + g.random() * 0.06
+        al = (0.04 + 0.08 * g.random()) * a * (0.7 + 0.3 * math.sin(t * (0.7 + g.random()) + i))
+        L_ = H * 1.8
+        ctx.move_to(x, y)
+        ctx.line_to(x + math.cos(ang - wdt) * L_, y + math.sin(ang - wdt) * L_)
+        ctx.line_to(x + math.cos(ang + wdt) * L_, y + math.sin(ang + wdt) * L_)
+        ctx.close_path()
+        lg = cairo.LinearGradient(x, y, x + math.cos(ang) * L_, y + math.sin(ang) * L_)
+        lg.add_color_stop_rgba(0, *color, al)
+        lg.add_color_stop_rgba(1, *color, 0)
+        ctx.set_source(lg)
+        ctx.fill()
+    ctx.restore()
+
+
+_SMOKE = []
+
+
+def _smoke_tex():
+    if _SMOKE:
+        return _SMOKE[0]
+    g = np.random.default_rng(13)
+    acc = np.zeros((270, 480), np.float32)
+    for oc, amp in ((8, 1.0), (16, 0.5), (32, 0.25), (64, 0.12)):
+        n = g.random((270 // (270 // oc) + 2, 480 // (270 // oc) + 2)).astype(np.float32)
+        im = Image.fromarray((n * 255).astype(np.uint8)).resize((480 * 2, 270 * 2), Image.BICUBIC).crop((0, 0, 480, 270))
+        acc += np.asarray(im, np.float32) / 255 * amp
+    acc = (acc - acc.min()) / (acc.max() - acc.min())
+    acc = np.clip((acc - 0.45) * 2.2, 0, 1) ** 1.4
+    a = (acc * 255).astype(np.uint8)
+    img = Image.merge("RGBA", (Image.fromarray(a), Image.fromarray(a), Image.fromarray(a), Image.fromarray(a)))
+    img = img.resize((W * 2, H * 2), Image.BICUBIC).filter(ImageFilter.GaussianBlur(6))
+    from .gfx import surface_from_pil
+    _SMOKE.append(surface_from_pil(img))
+    return _SMOKE[0]
+
+
+def smoke(ctx, t, dur, strength=0.35, warm=True):
+    """Drifting haze / smoke layers (screen-like add)."""
+    a = env(t, dur, 0.8, 0.8) * strength
+    tex = _smoke_tex()
+    ctx.save()
+    ctx.set_operator(cairo.OPERATOR_ADD if warm else cairo.OPERATOR_SCREEN)
+    for k, (sp, sc) in enumerate(((22, 1.0), (-14, 1.3))):
+        ctx.save()
+        ox = -((t * sp + k * 400) % W)
+        ctx.translate(ox, -H * 0.3 + math.sin(t * 0.2 + k) * 40)
+        ctx.scale(sc, sc)
+        ctx.set_source_surface(tex, 0, 0)
+        ctx.get_source().set_extend(cairo.EXTEND_REPEAT)
+        ctx.paint_with_alpha(a * (0.6 if k else 1.0))
+        ctx.restore()
+    ctx.restore()
+
+
+
+# ------------------------------------------------------------------ titles, cards, headlines (impact versions)
+def zh_title(ctx, t, dur):
+    a = env(t, dur, 0.1, 1.0)
+    rad(ctx, W / 2, H / 2, W * 0.6, [(0, (0, 0, 0), 0.65 * a), (1, (0, 0, 0), 0.25 * a)])
+    ctx.paint()
+    rays(ctx, t, dur, x=W / 2, y=-120, strength=0.9)
+    st = 0.14
+    for i in range(4):
+        shockwave(ctx, W / 2 - 330 + i * 220, H / 2 - 40, t - i * st - 0.05, 420, RED, 8)
+        sparks_burst(ctx, W / 2 - 330 + i * 220, H / 2 - 40, t - i * st - 0.05, 26, 800)
+    fx_text(ctx, "大起大落", W / 2, H / 2 - 40, 230, t, "gold", "serif", 900, tracking=0.08, stagger=st,
+            alpha=a)
+    a2 = env(t - 0.9, dur - 0.9, 0.4, 1.0)
+    brush(ctx, W / 2 - 380, H / 2 + 135, t - 0.9, 760, 86, alpha=0.95 * a2)
+    text(ctx, "中国足球  1982 — 2026", W / 2, H / 2 + 136, 44, "sans", 800, CREAM, a2, "mm", tracking=0.35,
+         shadow=0.8)
+    flare(ctx, t, dur, x=W / 2 + 420 - t * 40, y=H / 2 - 120, strength=0.8)
+
+
+def zh_card(ctx, t, dur, num, title, years, upto_from, upto_to):
+    a = env(t, dur, 0.15, 0.3)
+    smoke(ctx, t, dur, 0.22)
+    box = (180, H * 0.62, W - 360, 200)
+    upto = lerp(upto_from, upto_to, ease_in_out(remap(t, 0.2, dur - 0.5)))
+    ecg(ctx, t, upto, box, 0.85 * a)
+    brush(ctx, W / 2 - 150, H * 0.2, t, 300, 64, alpha=0.95 * a)
+    text(ctx, num, W / 2, H * 0.2, 34, "sans", 900, CREAM, a, "mm", tracking=0.5, shadow=0.7)
+    style = "red" if title in ("坠落", "崩塌") else "gold"
+    n = len(title)
+    sz = 170 if n <= 2 else 150
+    fx_text(ctx, title, W / 2, H * 0.37, sz, t - 0.1, style, "serif", 900, tracking=0.25, stagger=0.12, alpha=a)
+    for i in range(n):
+        cxp = W / 2 + (i - (n - 1) / 2) * sz * 1.25
+        shockwave(ctx, cxp, H * 0.37, t - 0.1 - i * 0.12, 380, RED if style == "red" else GOLD, 6)
+        sparks_burst(ctx, cxp, H * 0.37, t - 0.1 - i * 0.12, 20, 650)
+    a3 = smooth(remap(t, 0.5, 0.9)) * a
+    text(ctx, years, W / 2, H * 0.505, 46, "bebas", 400, GOLD, a3, "mm", tracking=0.35, shadow=0.7)
+
+
+def headline(ctx, t, dur, year, place, home="", hs="", as_="", away="", note=""):
+    a = env(t, dur, 0.2, 0.35)
+    x = 120
+    y = H - BAR - 330
+    lin(ctx, 0, 0, 1300, 0, [(0, (0, 0, 0), 0.65 * a), (0.6, (0, 0, 0), 0.3 * a), (1, (0, 0, 0), 0)])
+    ctx.rectangle(0, y - 140, 1300, 360)
+    ctx.fill()
+    brush(ctx, x - 50, y - 26, t, 520 if len(str(year)) <= 4 else 720, 132, alpha=0.95 * a)
+    fx_text(ctx, str(year), x, y - 26, 132, t, "gold", "bebas", 400, tracking=0.04, stagger=0.05, anchor="l",
+            alpha=a, depth=6)
+    shockwave(ctx, x + 140, y - 26, t, 320, GOLD, 6)
+    k = ease_out(remap(t, 0.15, 0.55))
+    text(ctx, place, x + 6 + 30 * (1 - k), y + 70, 42, "sans", 800, CREAM, a * k, "lm", tracking=0.1,
+         shadow=0.9, shadow_blur=6)
+    if home:
+        a2 = env(t - 0.35, dur - 0.35, 0.25, 0.35)
+        yy = y + 150
+        text(ctx, home, x + 6, yy, 52, "sans", 900, CREAM, a2, "lm", shadow=0.9, shadow_blur=6)
+        hw = 52 * len(home) + 40
+        fx_text(ctx, f"{hs} : {as_}", x + hw, yy, 100, t - 0.35, "red" if int(str(hs)) < int(str(as_)) else "gold",
+                "bebas", 400, tracking=0.05, stagger=0.04, anchor="l", alpha=a2, depth=5)
+        sparks_burst(ctx, x + hw + 80, yy, t - 0.4, 22, 600)
+        text(ctx, away, x + hw + 210, yy, 52, "sans", 900, CREAM, a2, "lm", shadow=0.9, shadow_blur=6)
+    if note:
+        a3 = env(t - 0.6, dur - 0.6, 0.3, 0.35)
+        text(ctx, note, x + 6, y + (225 if home else 140), 32, "sans", 700, GOLD, a3, "lm", tracking=0.1,
+             shadow=0.9)
+
+
+def stamp(ctx, t, dur, text_, size=150, color="red", sub=""):
+    a = env(t, dur, 0.05, 0.4)
+    rad(ctx, W / 2, H / 2, W * 0.55, [(0, (0, 0, 0), 0.6 * a), (1, (0, 0, 0), 0.2 * a)])
+    ctx.paint()
+    style = {"red": "red", "gold": "gold", "cream": "silver"}[color]
+    c = {"red": RED, "gold": GOLD, "cream": (0.7, 0.85, 1.0)}[color]
+    shockwave(ctx, W / 2, H / 2 - 20, t, 900, c, 12)
+    sparks_burst(ctx, W / 2, H / 2 - 20, t, 44, 1100, c)
+    font = "bebas" if all(ch.isascii() for ch in text_) else "serif"
+    fx_text(ctx, text_, W / 2, H / 2 - 20, size, t, style, font, 900 if font == "serif" else 400, tracking=0.08,
+            stagger=0.05, alpha=a)
+    if sub:
+        a2 = env(t - 0.35, dur - 0.35, 0.3, 0.4)
+        brush(ctx, W / 2 - 330, H / 2 + size * 0.62 + 22, t - 0.35, 660, 70, alpha=0.9 * a2)
+        text(ctx, sub, W / 2, H / 2 + size * 0.62 + 22, 40, "sans", 800, CREAM, a2, "mm", tracking=0.3, shadow=0.8)
+
+
+def glitch(ctx, t, dur, words):
+    a = env(t, dur, 0.1, 0.4)
+    n = len(words)
+    for i, w_ in enumerate(words):
+        ti = t - i * 0.55
+        if ti < 0:
+            continue
+        flick = 1.0 if ti > 0.3 else (0.15 if int(ti * 40) % 2 else 1.0)
+        x = W / 2 + (i - (n - 1) / 2) * 440
+        jit = (math.sin(t * 53 + i) * 10) if int(t * 7 + i) % 4 == 0 else 0
+        text(ctx, w_, x + jit + 7, H / 2 - 40, 150, "serif", 900, (0.1, 0.9, 1.0), 0.45 * a * flick, "mm")
+        text(ctx, w_, x + jit - 7, H / 2 - 40, 150, "serif", 900, RED, 0.6 * a * flick, "mm")
+        fx_text(ctx, w_, x + jit, H / 2 - 40, 150, ti + 1, "silver", "serif", 900, tracking=0.05, alpha=a * flick,
+                slam=False, shine=False)
+        shockwave(ctx, x, H / 2 - 40, ti, 300, RED, 6)
+
+
+def shootout(ctx, t, dur):
+    a = env(t, dur, 0.3, 0.5)
+    k = ease_out(remap(t, 0, 0.5))
+    y = H * 0.24
+    lin(ctx, 0, y - 110, 0, y + 230, [(0, (0, 0, 0), 0), (0.3, (0, 0, 0), 0.65 * a), (0.7, (0, 0, 0), 0.65 * a),
+                                     (1, (0, 0, 0), 0)])
+    ctx.rectangle(0, y - 110, W, 340)
+    ctx.fill()
+    brush(ctx, W / 2 - 160, y - 50, t, 320, 62, alpha=0.95 * a)
+    text(ctx, "点球大战", W / 2, y - 50, 36, "sans", 900, CREAM, a, "mm", tracking=0.6)
+    fx_text(ctx, "4 : 3", W / 2, y + 60, 170, t - 0.4, "gold", "bebas", 400, tracking=0.06, stagger=0.08, alpha=a)
+    shockwave(ctx, W / 2, y + 60, t - 0.4, 900, GOLD, 12)
+    sparks_burst(ctx, W / 2, y + 60, t - 0.4, 48, 1200)
+    text(ctx, "中国", W / 2 - 330 * k, y + 64, 64, "sans", 900, CREAM, a, "mm", shadow=0.9)
+    text(ctx, "乌兹别克斯坦", W / 2 + 350 * k + 50, y + 64, 48, "sans", 800, CREAM, a * 0.9, "mm", shadow=0.9)
+    a3 = env(t - 1.0, dur - 1.0, 0.4, 0.5)
+    text(ctx, "门将 李昊  扑出 2 球", W / 2, y + 185, 40, "sans", 800, GOLD, a3, "mm", tracking=0.2, shadow=0.9)
+
+
+def medal(ctx, t, dur):
+    a = env(t, dur, 0.4, 0.8)
+    k = ease_out_back(remap(t, 0, 0.7), 1.8)
+    cx, cy, r = W * 0.72, H * 0.43, 150 * lerp(0.6, 1.0, k)
+    rays(ctx, t, dur, x=cx, y=cy, strength=0.9, color=(1.0, 0.75, 0.45))
+    glow(ctx, cx, cy, r * 2.6, hexc("#d08a45"), 0.5 * a)
+    rad(ctx, cx - r * 0.3, cy - r * 0.35, r * 1.3, [(0, hexc("#f3c08a"), a), (0.55, hexc("#b8713a"), a),
+                                                     (1, hexc("#6e3d18"), a)])
+    ctx.arc(cx, cy, r, 0, TAU)
+    ctx.fill()
+    ctx.set_line_width(r * 0.06)
+    ctx.set_source_rgba(1, 0.9, 0.75, 0.5 * a)
+    ctx.arc(cx, cy, r * 0.82, 0, TAU)
+    ctx.stroke()
+    text(ctx, "铜", cx, cy, r * 0.9, "serif", 900, hexc("#5a2e10"), 0.85 * a, "mm")
+    sweep = (t * 0.5) % 1.6
+    if sweep < 1:
+        ang = -1 + sweep * 2
+        glow(ctx, cx + ang * r * 0.7, cy - ang * r * 0.4, r * 0.5, (1, 1, 1), 0.35 * a)
+    fx_text(ctx, "28", W * 0.27, H * 0.40, 280, t - 0.4, "gold", "bebas", 400, tracking=0.04, stagger=0.1, alpha=a)
+    shockwave(ctx, W * 0.27, H * 0.40, t - 0.4, 700, GOLD, 10)
+    fx_text(ctx, "年", W * 0.27 + 190, H * 0.40 + 70, 80, t - 0.6, "white", "serif", 900, alpha=a)
+    a2 = env(t - 0.9, dur - 0.9, 0.4, 0.8)
+    text(ctx, "1998 曼谷  →  2026 名古屋", W * 0.27, H * 0.40 + 180, 36, "sans", 800, CREAM, a2, "mm",
+         tracking=0.1, shadow=0.9)
+    flare(ctx, t, dur, x=cx - r * 0.4, y=cy - r * 0.5, strength=0.7, color=(1.0, 0.7, 0.4))
+
+
+def zh_end(ctx, t, dur):
+    dark = 0.75 * smooth(remap(t, 0, 2.5))
+    ctx.set_source_rgba(0, 0, 0, dark)
+    ctx.paint()
+    a = env(t - 0.8, dur - 0.8, 1.2, 1.5)
+    smoke(ctx, t, dur, 0.25)
+    box = (220, H * 0.62, W - 440, 160)
+    ecg(ctx, t, lerp(1982, 2026, ease_in_out(remap(t, 0.5, 5.0))), box, 0.7 * a, labels=False)
+    fx_text(ctx, "大起大落", W / 2, H * 0.33, 190, t - 0.8, "gold", "serif", 900, tracking=0.08, stagger=0.15,
+            alpha=a)
+    for i in range(4):
+        shockwave(ctx, W / 2 - 290 + i * 195, H * 0.33, t - 0.8 - i * 0.15, 380, GOLD, 6)
+    a2 = env(t - 2.2, dur - 2.2, 1.2, 1.5)
+    brush(ctx, W / 2 - 360, H * 0.475, t - 2.2, 720, 76, alpha=0.9 * a2)
+    text(ctx, "致每一个，还在等待的人", W / 2, H * 0.475, 46, "sans", 900, CREAM, a2, "mm", tracking=0.3, shadow=0.8)
+    a3 = env(t - 4.0, dur - 4.0, 1.0, 1.5) * 0.5
+    for i, ln in enumerate(["画面：Kinetics-700 数据集公开视频片段（示意画面，非比赛原始影像）",
+                            "配音：Kokoro 神经网络语音  ·  配乐：本片原创合成"]):
+        text(ctx, ln, W / 2, H - BAR - 96 + i * 34, 22, "sans", 400, CREAM, a3, "mm", tracking=0.05)
+    flare(ctx, t, dur, x=W * 0.2 + t * 30, y=H * 0.3, strength=0.6)
+
+
+def chant(ctx, t, dur, cycles=3):
+    c = int(t // CHANT_CYCLE)
+    lt = t - c * CHANT_CYCLE
+    if c >= cycles:
+        return
+    big = 1.0 + 0.1 * c
+    rad(ctx, W / 2, H / 2, W * 0.6, [(0, (0, 0, 0), 0.4), (1, (0, 0, 0), 0.0)])
+    ctx.paint()
+    fade_out = smooth(remap(lt, CHANT_CYCLE - 0.1, CHANT_CYCLE - 0.35))
+    ctx.save()
+    ctx.translate(W / 2, H * 0.37)
+    ctx.scale(big, big)
+    fx_text(ctx, "中国队", 0, 0, 160, lt, "white", "serif", 900, tracking=0.25, stagger=0.09, alpha=fade_out)
+    ctx.restore()
+    shockwave(ctx, W / 2, H * 0.37, lt, 800, (0.7, 0.85, 1.0), 10)
+    if lt >= 1.0:
+        ctx.save()
+        ctx.translate(W / 2, H * 0.63)
+        ctx.scale(big, big)
+        fx_text(ctx, "加油！", 0, 0, 200, lt - 1.0, "red", "serif", 900, tracking=0.2, stagger=0.08,
+                alpha=fade_out)
+        ctx.restore()
+        shockwave(ctx, W / 2, H * 0.63, lt - 1.0, 1000, RED, 14)
+        sparks_burst(ctx, W / 2, H * 0.63, lt - 1.0, 48, 1300)
+    for ct in CHANT_CLAPS:
+        d = lt - ct
+        if 0 <= d < 0.25:
+            p = (1 - d / 0.25) ** 2
+            rad(ctx, W / 2, H / 2, W * 0.75, [(0, RED, 0.0), (0.65, RED, 0.0), (1, RED, 0.6 * p)])
+            ctx.paint()

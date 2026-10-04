@@ -337,6 +337,58 @@ def chant_track(cycles=3, cycle=4.0, claps=(2.0, 2.5, 3.0, 3.25, 3.5)):
     return add_reverb(x, 0.35, 2.2)
 
 
+def whoosh(length=0.6, peak=0.4, lo=300, hi=6000, gain=0.7):
+    """Air whoosh whose loudest point is at `peak` seconds."""
+    n = int(length * SR)
+    t = np.arange(n) / SR
+    x = rng.normal(0, 1, n)
+    out = np.zeros(n)
+    step = 1200
+    for i in range(0, n, step):
+        u = clamp01(1 - abs(i / SR - peak) / max(peak, length - peak))
+        fc = lo + (hi - lo) * u ** 1.5
+        b, a = signal.butter(2, [fc / (SR / 2) * 0.6, min(0.98, fc / (SR / 2) * 1.4)], "band")
+        out[i:i + step] = signal.lfilter(b, a, x[i:i + step])
+    env_ = np.where(t < peak, (t / peak) ** 2.5, np.exp(-(t - peak) * 9))
+    return out * env_ * gain
+
+
+def clamp01(v):
+    return max(0.0, min(1.0, v))
+
+
+def transition_sfx(kind):
+    """Returns (stereo, offset): offset = seconds before the cut where the sound starts."""
+    if kind in ("whip", "whip_v"):
+        w = whoosh(0.5, 0.22, 600, 8000, 0.8)
+        L = np.concatenate([w, np.zeros(2000)])
+        R = np.concatenate([np.zeros(2000), w])
+        return np.stack([L, R]), 0.22
+    if kind in ("zoom", "spin"):
+        w = whoosh(0.8, 0.3, 200, 5000, 0.8)
+        hit = np.pad(taiko(1.2) * 0.5, (int(0.3 * SR), 0))[: len(w)]
+        x = w + hit
+        return np.stack([x, x]), 0.3
+    if kind == "glitch":
+        n = int(0.4 * SR)
+        x = np.zeros(n)
+        for k in range(10):
+            i = int(rng.uniform(0, 0.32) * SR)
+            m = int(rng.uniform(0.01, 0.04) * SR)
+            f = rng.uniform(300, 3000)
+            x[i:i + m] += np.sign(np.sin(2 * np.pi * f * np.arange(m) / SR)) * 0.25
+        x += rng.normal(0, 1, n) * 0.08 * np.exp(-np.arange(n) / SR * 6)
+        return np.stack([x, x]), 0.2
+    if kind == "burn":
+        w = whoosh(1.0, 0.3, 150, 3000, 0.6)
+        b = impact()[: len(w) + int(0.3 * SR)] * 0.5
+        x = np.zeros(max(len(w), len(b)))
+        x[: len(w)] += w
+        x[int(0.3 * SR): int(0.3 * SR) + len(b) - int(0.3 * SR)] += b[: len(b) - int(0.3 * SR)]
+        return np.stack([x, x]), 0.3
+    return None, 0
+
+
 def make_sfx(name, length=None):
     if name == "chant":
         return chant_track()
@@ -383,6 +435,11 @@ def render(shots, total, voice, out_wav):
             place(fx, make_sfx(name, length), tt, gain)
         for clip, lt, a, dur, gain in sh.audio:
             place(amb, clip_audio(clip, a, dur), sh.start + lt, gain)
+    from .engine import transitions
+    for c, kind in transitions(shots):
+        x, off = transition_sfx(kind)
+        if x is not None:
+            place(fx, x, c - off, 0.75)
     plan.sort()
     print(f"  score: {len(plan)} sections", flush=True)
     mus = music_track(plan, total)[:, :n]
