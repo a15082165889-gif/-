@@ -62,3 +62,9 @@ python3 build.py --film china    # -> build/china/china.mp4 and china_web.mp4
   embers, light leaks and streaks. Impacts also trigger camera shake + RGB split.
 - Sound: `film/audio_epic.py` — taiko, string ostinato, brass, braams, risers and a multi-voice
   "中国队，加油！" crowd chant, switching mood chapter by chapter.
+
+**Music in 大起大落:** "Volatile Reaction", "Egmont Overture Finale", "Big Drumming" and
+"Strength of the Titans" by Kevin MacLeod (incompetech.com), licensed under Creative Commons:
+By Attribution 4.0 (http://creativecommons.org/licenses/by/4.0/), stored in `music/library/` and cued in
+`film/china_story.py` (`MUSIC_CUES`); the synthesized score fills the gaps. To use your own song instead,
+drop it into `music/` and run `python3 build.py --film china --remix`.

@@ -480,6 +480,61 @@ def song_bus(plan, total, n, climax_film, synth):
     return bus * song_on * gain + synth_n * (1 - song_on) * 0.8
 
 
+def apply_cues(shots, total, n, synth):
+    """Lay licensed recordings over the score at the cue points; the synth score is faded out under them."""
+    import os
+
+    from .gfx import ROOT
+    from .project import story
+    cues = getattr(story, "MUSIC_CUES", [])
+    if not cues:
+        return synth
+    by_id = {}
+    for sh in shots:
+        by_id.setdefault(sh.id, sh)
+
+    def ft(ref):
+        sid, expr = ref
+        sh = by_id[sid]
+        return sh.start + (sh.resolve(expr) if isinstance(expr, str) else expr)
+
+    synth_n = synth / (np.max(np.abs(synth)) + 1e-9)
+    rec = np.zeros_like(synth)
+    cover = np.zeros(n)
+    cache = {}
+    for c in cues:
+        t0, t1 = ft(c["start"]), ft(c["end"])
+        if "src_end_at" in c:
+            trk_t, film_expr = c["src_end_at"]
+            src = trk_t - (ft((c["end"][0], film_expr)) - t0)
+        else:
+            src = c.get("src", 0.0)
+        path = os.path.join(ROOT, c["track"])
+        if path not in cache:
+            x = load_song(path)
+            cache[path] = x / (np.max(np.abs(x)) + 1e-9)
+        x = cache[path]
+        i0, i1 = int(t0 * SR), min(n, int(t1 * SR))
+        s0 = int(max(0.0, src) * SR)
+        m = min(i1 - i0, x.shape[1] - s0)
+        if m <= 0:
+            continue
+        seg = x[:, s0:s0 + m].copy()
+        fin, fout = int(c.get("fin", 0.4) * SR), int(c.get("fout", 0.8) * SR)
+        env_ = np.ones(m)
+        if fin:
+            env_[:fin] = np.linspace(0, 1, min(fin, m))[: min(fin, m)]
+        if fout:
+            k = min(fout, m)
+            env_[-k:] = np.minimum(env_[-k:], np.linspace(1, 0, k))
+        rec[:, i0:i0 + m] += seg * env_ * c.get("gain", 1.0)
+        cover[i0:i0 + m] = np.maximum(cover[i0:i0 + m], env_)
+        print(f"  cue {os.path.basename(path)} @ {t0:.1f}-{t1:.1f}s (src {src:.1f}s)", flush=True)
+    k = int(0.3 * SR)
+    cover = np.clip(np.convolve(cover, np.ones(k) / k, mode="same"), 0, 1)
+    return rec * 0.95 + synth_n * (1 - cover) * 0.85
+
+
 def render(shots, total, voice, out_wav):
     import soundfile as sf
     n = int((total + 1) * SR)
@@ -521,6 +576,8 @@ def render(shots, total, voice, out_wav):
     if find_song():
         climax = next((sh.start + sh.resolve("g5.end-0.9") for sh in shots if "g5" in sh.cues), total * 0.7)
         mus = song_bus(plan, total, n, climax, mus)
+    else:
+        mus = apply_cues(shots, total, n, mus)
     mus = mus / (np.max(np.abs(mus)) + 1e-9) * 0.55
     env = np.abs(vo[0])
     win = int(0.05 * SR)

@@ -681,9 +681,11 @@ def zh_end(ctx, t, dur):
     brush(ctx, W / 2 - 360, H * 0.475, t - 2.2, 720, 76, alpha=0.9 * a2)
     text(ctx, "致每一个，还在等待的人", W / 2, H * 0.475, 46, "sans", 900, CREAM, a2, "mm", tracking=0.3, shadow=0.8)
     a3 = env(t - 4.0, dur - 4.0, 1.0, 1.5) * 0.5
+    from .project import story
     for i, ln in enumerate(["画面：Kinetics-700 数据集公开视频片段（示意画面，非比赛原始影像）",
-                            "配音：Kokoro 神经网络语音  ·  配乐：本片原创合成"]):
-        text(ctx, ln, W / 2, H - BAR - 96 + i * 34, 22, "sans", 400, CREAM, a3, "mm", tracking=0.05)
+                            getattr(story, "MUSIC_CREDITS", "配乐：本片原创合成"),
+                            "配音：Kokoro 神经网络语音  ·  音效与部分配乐：本片原创合成"]):
+        text(ctx, ln, W / 2, H - BAR - 120 + i * 32, 21, "sans", 400, CREAM, a3, "mm", tracking=0.03)
     flare(ctx, t, dur, x=W * 0.2 + t * 30, y=H * 0.3, strength=0.6)
 
 

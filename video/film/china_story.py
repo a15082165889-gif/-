@@ -78,3 +78,22 @@ SPOKEN_LINES = {
     "g5": "门将李昊，两次扑出点球！四比三！",
     "g6": "时隔二十八年，中国男足，再一次站上了亚运会的领奖台！",
 }
+
+
+# Licensed music cues (Kevin MacLeod, incompetech.com, CC BY 4.0), laid over the synthesized score.
+# start/end = (shot id, time expression); src = seconds into the track, or src_end_at = (track time,
+# film time expression) to land the track's ending on a given moment.
+LIB = "music/library/"
+MUSIC_CUES = [
+    dict(track=LIB + "Volatile Reaction.mp3", start=("cold", 0), end=("a2", "a2.end+0.4"), src=0.0, fout=1.2),
+    dict(track=LIB + "Egmont Overture Finale.mp3", start=("c1", "c1.end"), end=("c3", "end"), src=8.0, fin=0.05,
+         fout=1.5),
+    dict(track=LIB + "Big Drumming.mp3", start=("e1", 0), end=("e2", "end"), src=84.0, fin=0.3, fout=1.0),
+    dict(track=LIB + "Strength of the Titans.mp3", start=("g4", 0), end=("g5", "end"), src=0.0, fin=0.05,
+         fout=0.08),
+    dict(track=LIB + "Strength of the Titans.mp3", start=("j4", 0), end=("h", 0), src=20.0, fin=0.05, fout=1.2),
+    dict(track=LIB + "Egmont Overture Finale.mp3", start=("h", 0), end=("h", "end"), src_end_at=(97.0, "end-2.0"),
+         fin=1.0, fout=0.5),
+]
+MUSIC_CREDITS = "音乐：Kevin MacLeod (incompetech.com)  Volatile Reaction · Egmont Overture Finale · Big Drumming · " \
+                "Strength of the Titans  CC BY 4.0"
