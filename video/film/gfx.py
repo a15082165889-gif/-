@@ -295,6 +295,9 @@ def grain_bank():
     return np.repeat(big[..., None], 3, axis=3) * np.array([1.0, 0.9, 1.1], np.float32)
 
 
+GRAIN_SCALE = 0.45  # film grain is costly to encode; keep it subtle
+
+
 def grade(frame, t, look, seed=0):
     """In-place colour grade of an HxWx4 uint8 BGRA frame (cairo's ARGB32 memory order).
 
@@ -342,7 +345,7 @@ def grade(frame, t, look, seed=0):
     gr = look.get("grain", 0.0)
     if gr:
         bank = grain_bank()
-        x += bank[(int(t * FPS) + seed) % len(bank)] * gr
+        x += bank[(int(t * FPS) + seed) % len(bank)] * (gr * GRAIN_SCALE)
     np.clip(x, 0, 1, out=x)
     x *= 255
     x += 0.5
