@@ -76,6 +76,14 @@ class Shot:
             t += d + o["gap"]
         end = t - o["gap"] + o["tail"] if self.lines else 0.0
         self.dur = max(o["min"], end)
+        if not self.lines and spec.get("segs") and not any(sg.get("fill") for sg in spec["segs"]):
+            seg_total = 0.0
+            for sg in spec["segs"]:
+                if sg["kind"] == "clip":
+                    seg_total += sg.get("freeze") or (sg["b"] - sg["a"]) / sg.get("speed", 1.0)
+                elif "dur" in sg:
+                    seg_total += sg["dur"]
+            self.dur = max(o["min"] if spec.get("min_is_floor") else 0.0, seg_total)
         self.xf = o["xf"]
         self.look = spec.get("look")
         self.card = spec.get("card")
@@ -158,7 +166,7 @@ def build_timeline(voice):
 def seg_key(s):
     sp = s.spec
     key = json.dumps([sp["clip"], round(s.a, 3), round(s.dur, 3), round(s.speed, 4), sp.get("fit", "cover"),
-                      sp.get("fit_x", 0.5), sp.get("freeze", 0), 2], sort_keys=True)
+                      sp.get("fit_x", 0.5), sp.get("freeze", 0), CLIPS[sp["clip"]].get("crop"), 3], sort_keys=True)
     return hashlib.sha1(key.encode()).hexdigest()[:14]
 
 
@@ -173,6 +181,9 @@ def prepare_segment(s):
     info = CLIPS[s.spec["clip"]]
     lowres = info["h"] <= 480
     pre = "hqdn3d=2:2:4:4," if lowres else ""
+    if info.get("crop"):
+        cx, cy, cw, ch = info["crop"]
+        pre = f"crop=iw*{cw:.4f}:ih*{ch:.4f}:iw*{cx:.4f}:ih*{cy:.4f}," + pre
     sharpen = ",unsharp=5:5:0.7:5:5:0.0" if lowres else ""
     if s.spec.get("fit") == "contain":
         vf = (f"{pre}split[a][b];[a]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"

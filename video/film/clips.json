@@ -619,5 +619,431 @@
   "dur": 10.01,
   "fps": "25/1",
   "audio": true
+ },
+ "BV1134y117qn.f30064": {
+  "cls": "real",
+  "file": "BV1134y117qn.f30064.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 630.41,
+  "fps": "",
+  "audio": true,
+  "note": ""
+ },
+ "BV11JZHYQEG1": {
+  "cls": "real",
+  "file": "BV11JZHYQEG1.mp4",
+  "w": 360,
+  "h": 640,
+  "dur": 45.56,
+  "fps": "",
+  "audio": true,
+  "note": "2001_米卢重逢落泪"
+ },
+ "BV12R4WeqEqe": {
+  "cls": "real",
+  "file": "BV12R4WeqEqe.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 127.73,
+  "fps": "",
+  "audio": true,
+  "note": "球迷_大连助威"
+ },
+ "BV12W411f7WK": {
+  "cls": "real",
+  "file": "BV12W411f7WK.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 244.02,
+  "fps": "",
+  "audio": true,
+  "note": "2016_2比0卡塔尔"
+ },
+ "BV13ZHz6pEbk": {
+  "cls": "real",
+  "file": "BV13ZHz6pEbk.mp4",
+  "w": 1080,
+  "h": 720,
+  "dur": 64.0,
+  "fps": "",
+  "audio": true,
+  "note": "2026_U23年度回顾"
+ },
+ "BV15441197MG": {
+  "cls": "real",
+  "file": "BV15441197MG.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 175.12,
+  "fps": "",
+  "audio": true,
+  "note": "2017_逆转卡塔尔"
+ },
+ "BV16b411R7Fw": {
+  "cls": "real",
+  "file": "BV16b411R7Fw.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 231.85,
+  "fps": "",
+  "audio": true,
+  "note": ""
+ },
+ "BV19NAgz6E7p": {
+  "cls": "real",
+  "file": "BV19NAgz6E7p.mp4",
+  "w": 960,
+  "h": 720,
+  "dur": 477.77,
+  "fps": "",
+  "audio": true,
+  "note": "2002_杨晨击中立柱"
+ },
+ "BV1A2Hi6PE8E": {
+  "cls": "real",
+  "file": "BV1A2Hi6PE8E.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 60.84,
+  "fps": "",
+  "audio": true,
+  "note": "更衣室_火车舞"
+ },
+ "BV1A3411u7P6": {
+  "cls": "real",
+  "file": "BV1A3411u7P6.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 291.09,
+  "fps": "",
+  "audio": true,
+  "note": "2001_赛后全场",
+  "crop": [
+   0.0078125,
+   0.002777777777777778,
+   0.9765625,
+   0.9972222222222222
+  ]
+ },
+ "BV1Bg411Y7wp": {
+  "cls": "real",
+  "file": "BV1Bg411Y7wp.mp4",
+  "w": 360,
+  "h": 640,
+  "dur": 154.44,
+  "fps": "",
+  "audio": true,
+  "note": "2001_五里河进入世界杯"
+ },
+ "BV1ED4y1r7Kh": {
+  "cls": "real",
+  "file": "BV1ED4y1r7Kh.mp4",
+  "w": 960,
+  "h": 720,
+  "dur": 152.11,
+  "fps": "",
+  "audio": true,
+  "note": "2001_段暄采访米卢",
+  "crop": [
+   0.00625,
+   0.005555555555555556,
+   0.9875,
+   0.9833333333333333
+  ]
+ },
+ "BV1EN4y1m7KV": {
+  "cls": "real",
+  "file": "BV1EN4y1m7KV.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 227.65,
+  "fps": "",
+  "audio": true,
+  "note": "2017_于大宝头球",
+  "crop": [
+   0.09,
+   0.05,
+   0.82,
+   0.9
+  ]
+ },
+ "BV1Ep4y1z76Q": {
+  "cls": "real",
+  "file": "BV1Ep4y1z76Q.mp4",
+  "w": 480,
+  "h": 320,
+  "dur": 1195.83,
+  "fps": "",
+  "audio": true,
+  "note": "2001_全国各地欢庆",
+  "crop": [
+   0.05416666666666667,
+   0.0,
+   0.8916666666666667,
+   1.0
+  ]
+ },
+ "BV1FL41167rk": {
+  "cls": "real",
+  "file": "BV1FL41167rk.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 601.72,
+  "fps": "",
+  "audio": true,
+  "note": "2004_半决赛伊朗回顾",
+  "crop": [
+   0.0,
+   0.03611111111111111,
+   1.0,
+   0.9638888888888889
+  ]
+ },
+ "BV1GDHq6JE4J": {
+  "cls": "real",
+  "file": "BV1GDHq6JE4J.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 63.53,
+  "fps": "",
+  "audio": true,
+  "note": "采访_王钰栋"
+ },
+ "BV1JaHv69EYv": {
+  "cls": "real",
+  "file": "BV1JaHv69EYv.mp4",
+  "w": 1280,
+  "h": 696,
+  "dur": 676.97,
+  "fps": "",
+  "audio": true,
+  "note": "2026_亚运李昊"
+ },
+ "BV1LR4y1N7uU": {
+  "cls": "real",
+  "file": "BV1LR4y1N7uU.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 217.57,
+  "fps": "",
+  "audio": true,
+  "note": ""
+ },
+ "BV1MRo4YgESk": {
+  "cls": "real",
+  "file": "BV1MRo4YgESk.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 67.0,
+  "fps": "",
+  "audio": true,
+  "note": "球迷_七万人国歌"
+ },
+ "BV1N3Hk6HEU5": {
+  "cls": "real",
+  "file": "BV1N3Hk6HEU5.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 75.95,
+  "fps": "",
+  "audio": true,
+  "note": "更衣室_U23狂欢"
+ },
+ "BV1NrHe6fE4p": {
+  "cls": "real",
+  "file": "BV1NrHe6fE4p.mp4",
+  "w": 360,
+  "h": 638,
+  "dur": 34.13,
+  "fps": "",
+  "audio": true,
+  "note": "更衣室_手势舞"
+ },
+ "BV1RyrQBBEu6": {
+  "cls": "real",
+  "file": "BV1RyrQBBEu6.mp4",
+  "w": 1280,
+  "h": 544,
+  "dur": 392.67,
+  "fps": "",
+  "audio": true,
+  "note": "2026_U23亚洲杯点球胜乌兹",
+  "crop": [
+   0.1,
+   0.0,
+   0.8,
+   1.0
+  ]
+ },
+ "BV1SF4m1A7LG": {
+  "cls": "real",
+  "file": "BV1SF4m1A7LG.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 85.94,
+  "fps": "",
+  "audio": true,
+  "note": "2002_国歌在世界杯唱响"
+ },
+ "BV1dV4y1j7Y6": {
+  "cls": "real",
+  "file": "BV1dV4y1j7Y6.mp4",
+  "w": 1280,
+  "h": 640,
+  "dur": 281.08,
+  "fps": "",
+  "audio": true,
+  "note": "2017_长沙夜晚",
+  "crop": [
+   0.0640625,
+   0.0,
+   0.9125,
+   1.0
+  ]
+ },
+ "BV1eAHv6CEa4": {
+  "cls": "real",
+  "file": "BV1eAHv6CEa4.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 570.85,
+  "fps": "",
+  "audio": true,
+  "note": "2026_亚运点球大战"
+ },
+ "BV1hmscziEXn": {
+  "cls": "real",
+  "file": "BV1hmscziEXn.mp4",
+  "w": 1280,
+  "h": 718,
+  "dur": 43.13,
+  "fps": "",
+  "audio": true,
+  "note": "2002_对土耳其首发",
+  "crop": [
+   0.128125,
+   0.0,
+   0.746875,
+   1.0
+  ]
+ },
+ "BV1jKHj6fEco": {
+  "cls": "real",
+  "file": "BV1jKHj6fEco.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 60.72,
+  "fps": "",
+  "audio": true,
+  "note": "采访_安东尼奥"
+ },
+ "BV1jt411p7N8": {
+  "cls": "real",
+  "file": "BV1jt411p7N8.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 123.48,
+  "fps": "",
+  "audio": true,
+  "note": "2017_中韩回顾"
+ },
+ "BV1kfSFYTERw": {
+  "cls": "real",
+  "file": "BV1kfSFYTERw.mp4",
+  "w": 1280,
+  "h": 540,
+  "dur": 301.35,
+  "fps": "",
+  "audio": true,
+  "note": "球迷_国歌热血"
+ },
+ "BV1nCHr66EES": {
+  "cls": "real",
+  "file": "BV1nCHr66EES.mp4",
+  "w": 1280,
+  "h": 574,
+  "dur": 206.67,
+  "fps": "",
+  "audio": true,
+  "note": ""
+ },
+ "BV1pFzmBKEa7": {
+  "cls": "real",
+  "file": "BV1pFzmBKEa7.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 532.33,
+  "fps": "",
+  "audio": true,
+  "note": "2026_U23亚洲杯颁奖亚军"
+ },
+ "BV1pSHL66EnX": {
+  "cls": "real",
+  "file": "BV1pSHL66EnX.mp4",
+  "w": 1280,
+  "h": 576,
+  "dur": 69.33,
+  "fps": "",
+  "audio": true,
+  "note": "采访_李昊",
+  "crop": [
+   0.103125,
+   0.0,
+   0.5234375,
+   1.0
+  ]
+ },
+ "BV1qQHa6VEAs": {
+  "cls": "real",
+  "file": "BV1qQHa6VEAs.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 287.37,
+  "fps": "",
+  "audio": true,
+  "note": "2026_亚运铜牌集锦"
+ },
+ "BV1rWVw6rEPQ": {
+  "cls": "real",
+  "file": "BV1rWVw6rEPQ.mp4",
+  "w": 960,
+  "h": 720,
+  "dur": 31.85,
+  "fps": "",
+  "audio": true,
+  "note": "更衣室_U17喊话",
+  "crop": [
+   0.0020833333333333333,
+   0.05277777777777778,
+   0.9979166666666667,
+   0.925
+  ]
+ },
+ "BV1td4y1P7Wv": {
+  "cls": "real",
+  "file": "BV1td4y1P7Wv.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 449.24,
+  "fps": "",
+  "audio": true,
+  "note": "2004_亚洲杯半决赛点球",
+  "crop": [
+   0.10625,
+   0.0,
+   0.796875,
+   0.9944444444444445
+  ]
+ },
+ "BV1zG411c7Et": {
+  "cls": "real",
+  "file": "BV1zG411c7Et.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 45.07,
+  "fps": "",
+  "audio": true,
+  "note": "2001_出线短片"
  }
 }

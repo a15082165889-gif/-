@@ -1029,3 +1029,57 @@ def zh_title(ctx, t, dur, title="大起大落", sub="中国足球  1982 — 2026
     brush(ctx, W / 2 - 300, H / 2 + 120, t - 0.9, 600, 70, alpha=a2)
     text(ctx, sub, W / 2, H / 2 + 120, 38, "sans", 900, (1, 1, 1), a2, "mm", tracking=0.35)
     flare(ctx, t, dur, x=W / 2 + 420 - t * 40, y=H / 2 - 110, strength=0.6)
+
+
+
+# ------------------------------------------------------------------ 《前进》 overlays
+def caption(ctx, t, dur, text=""):
+    """Small lower-left caption with a red tick, typed on."""
+    a = env(t, dur, 0.25, 0.35)
+    x, y = 120, H - BAR - 120
+    lin(ctx, 0, 0, 900, 0, [(0, (0, 0, 0), 0.55 * a), (1, (0, 0, 0), 0)])
+    ctx.rectangle(0, y - 44, 900, 88)
+    ctx.fill()
+    ctx.set_source_rgba(*hexc("#d81e1e"), a)
+    ctx.rectangle(x - 26, y - 22, 6, 44)
+    ctx.fill()
+    typewriter(ctx, text, t, x, y, 36, CREAM, a, cps=18)
+
+
+WINS = [(2001, "出线"), (2002, "世界杯"), (2004, "亚洲杯决赛"), (2016, "晋级十二强"), (2017, "1:0 韩国"),
+        (2026, "U23亚军"), (2026.6, "亚运铜牌")]
+
+
+def victory_end(ctx, t, dur):
+    dark = 0.7 * smooth(remap(t, 0, 2.0))
+    ctx.set_source_rgba(0, 0, 0, dark)
+    ctx.paint()
+    a = env(t, dur, 0.6, 1.2)
+    # animated timeline of wins
+    x0, x1, y = 230, W - 230, H * 0.66
+    k = ease_in_out(remap(t, 0.3, 4.5))
+    ctx.set_source_rgba(1, 1, 1, 0.25 * a)
+    ctx.rectangle(x0, y - 1, x1 - x0, 2)
+    ctx.fill()
+    ctx.set_source_rgba(*hexc("#e0262b"), a)
+    ctx.rectangle(x0, y - 2, (x1 - x0) * k, 4)
+    ctx.fill()
+    n = len(WINS)
+    for i, (yr, lab) in enumerate(WINS):
+        u = i / (n - 1)
+        if k < u:
+            continue
+        x = lerp(x0, x1, u)
+        pop = ease_out_back(remap(t, 0.3 + u * 4.2, 0.6 + u * 4.2), 2.5)
+        glow(ctx, x, y, 40, RED, 0.6 * a * pop)
+        ctx.set_source_rgba(1, 1, 1, a)
+        ctx.arc(x, y, 7 * pop, 0, TAU)
+        ctx.fill()
+        text(ctx, str(int(yr)), x, y - 40, 40, "bebas", 400, CREAM, a * pop, "mm", tracking=0.05)
+        text(ctx, lab, x, y + 42, 26, "sans", 800, GOLD, a * pop, "mm")
+    fx_text(ctx, "中国队 前进", W / 2, H * 0.36, 180, t - 0.6, "white", "sans", 900, tracking=0.12, stagger=0.12,
+            alpha=a)
+    a3 = env(t - 5.0, dur - 5.0, 1.0, 1.2) * 0.55
+    from .project import story
+    for i, ln in enumerate([getattr(story, "FOOTAGE_CREDITS", ""), getattr(story, "MUSIC_CREDITS", "")]):
+        text(ctx, ln, W / 2, H - BAR - 90 + i * 32, 21, "sans", 400, CREAM, a3, "mm", tracking=0.03)
