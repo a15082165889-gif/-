@@ -1,0 +1,425 @@
+{
+ "ball_turf": {
+  "cls": "passing soccer ball",
+  "file": "goT73iTowps_000034_000044.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 10.0,
+  "fps": "30/1",
+  "audio": true
+ },
+ "kid_garden": {
+  "cls": "shooting goal (soccer)",
+  "file": "vk7ZsxvcvNo_000024_000034.mp4",
+  "w": 480,
+  "h": 360,
+  "dur": 10.02,
+  "fps": "30/1",
+  "audio": true
+ },
+ "badminton": {
+  "cls": "playing badminton",
+  "file": "FEVWk21w3rE_000027_000037.mp4",
+  "w": 480,
+  "h": 360,
+  "dur": 10.01,
+  "fps": "15/1",
+  "audio": true
+ },
+ "pingpong": {
+  "cls": "playing ping pong",
+  "file": "AaliBXa5ePs_000007_000017.mp4",
+  "w": 480,
+  "h": 360,
+  "dur": 9.23,
+  "fps": "7927/1000",
+  "audio": true
+ },
+ "track": {
+  "cls": "hurdling",
+  "file": "93LWRM0s4Ng_000002_000012.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.03,
+  "fps": "359/12",
+  "audio": true
+ },
+ "hurdles": {
+  "cls": "hurdling",
+  "file": "8grrxZkZpGM_000019_000029.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "45000/1877",
+  "audio": true
+ },
+ "boots_ball": {
+  "cls": "kicking soccer ball",
+  "file": "bDQ_kY4MKck_000009_000019.mp4",
+  "w": 1270,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "29841/1000",
+  "audio": true
+ },
+ "kid_sky": {
+  "cls": "kicking soccer ball",
+  "file": "bRpu4FdHjlQ_000005_000015.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.05,
+  "fps": "25224/1667",
+  "audio": true
+ },
+ "juggle_boy": {
+  "cls": "juggling soccer ball",
+  "file": "Gh0k99zpeh8_000016_000026.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "pass_coach": {
+  "cls": "passing soccer ball",
+  "file": "iIHZt5QXqCU_000117_000127.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.03,
+  "fps": "7477/250",
+  "audio": true
+ },
+ "youth_event": {
+  "cls": "kicking soccer ball",
+  "file": "BFLL-fDD1_c_000041_000051.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "indoor_training": {
+  "cls": "passing soccer ball",
+  "file": "EiCAJM6Gg1U_000114_000124.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "30/1",
+  "audio": true
+ },
+ "goal_net_training": {
+  "cls": "shooting goal (soccer)",
+  "file": "UTk18FFtAPw_000002_000012.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.0,
+  "fps": "30/1",
+  "audio": true
+ },
+ "dusk_training": {
+  "cls": "passing soccer ball",
+  "file": "Hues2PJG-3s_000876_000886.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "coach_two": {
+  "cls": "passing soccer ball",
+  "file": "fDpEZTHGcNg_000076_000086.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "youth_match": {
+  "cls": "passing soccer ball",
+  "file": "GVYIT3d6I0U_000002_000012.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 9.89,
+  "fps": "45000/1877",
+  "audio": true
+ },
+ "low_turf": {
+  "cls": "kicking soccer ball",
+  "file": "AlLpbZQC0cU_000000_000010.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 7.92,
+  "fps": "30/1",
+  "audio": true
+ },
+ "feet_dribble": {
+  "cls": "passing soccer ball",
+  "file": "fkH13w-sfbo_000052_000062.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 9.07,
+  "fps": "24000/1001",
+  "audio": true
+ },
+ "feet_yellow": {
+  "cls": "passing soccer ball",
+  "file": "feENrImKikY_000026_000036.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "24000/1001",
+  "audio": true
+ },
+ "lone_ball": {
+  "cls": "kicking soccer ball",
+  "file": "98QgMxpAJ_g_000004_000014.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 7.63,
+  "fps": "30/1",
+  "audio": true
+ },
+ "rehab_corridor": {
+  "cls": "walking with crutches",
+  "file": "8xVd_19weDw_000099_000109.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "23/1",
+  "audio": true
+ },
+ "knee_brace": {
+  "cls": "walking with crutches",
+  "file": "9XkvmpNJ-X8_000277_000287.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "24000/1001",
+  "audio": true
+ },
+ "physio_knee": {
+  "cls": "massaging legs",
+  "file": "SL73o0HJpt4_000004_000014.mp4",
+  "w": 480,
+  "h": 360,
+  "dur": 10.0,
+  "fps": "2212/125",
+  "audio": true
+ },
+ "physio_stretch": {
+  "cls": "stretching leg",
+  "file": "B1fyZGBX7MA_000075_000085.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 9.71,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "sunset_crutches": {
+  "cls": "walking with crutches",
+  "file": "8zfo9l-4Cjc_000011_000021.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "writing": {
+  "cls": "writing",
+  "file": "4XAGvur86f0_000000_000010.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30/1",
+  "audio": true
+ },
+ "yawn": {
+  "cls": "yawning",
+  "file": "9sU3CQKOrdc_000000_000010.mp4",
+  "w": 480,
+  "h": 360,
+  "dur": 9.57,
+  "fps": "30/1",
+  "audio": true
+ },
+ "doze": {
+  "cls": "sleeping",
+  "file": "IgwFd5ilHSY_000111_000121.mp4",
+  "w": 548,
+  "h": 360,
+  "dur": 10.02,
+  "fps": "30/1",
+  "audio": true
+ },
+ "meal": {
+  "cls": "eating spaghetti",
+  "file": "CVnIZEzaeRs_000000_000010.mp4",
+  "w": 480,
+  "h": 360,
+  "dur": 10.01,
+  "fps": "30/1",
+  "audio": true
+ },
+ "far_field": {
+  "cls": "passing soccer ball",
+  "file": "GiO4ftSziF4_000143_000153.mp4",
+  "w": 960,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "dark_tv": {
+  "cls": "watching tv",
+  "file": "p8kxYjevOV0_000027_000037.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "tv_living": {
+  "cls": "watching tv",
+  "file": "OLymtVJko_M_000243_000253.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.0,
+  "fps": "30/1",
+  "audio": true
+ },
+ "tv_epl": {
+  "cls": "kicking soccer ball",
+  "file": "BKfpptUeUYE_000004_000014.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 6.4,
+  "fps": "25/1",
+  "audio": true
+ },
+ "tv_espn": {
+  "cls": "shooting goal (soccer)",
+  "file": "qDRupSmMgrY_000000_000010.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "bcast_run": {
+  "cls": "shooting goal (soccer)",
+  "file": "VjLlSPCx4ZM_000062_000072.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.0,
+  "fps": "30/1",
+  "audio": true
+ },
+ "bcast_wide": {
+  "cls": "shooting goal (soccer)",
+  "file": "WASNLjKAF9c_000565_000575.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "25/1",
+  "audio": true
+ },
+ "bcast_netgoal": {
+  "cls": "shooting goal (soccer)",
+  "file": "Vw1ThYfCiC0_000012_000022.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 10.01,
+  "fps": "25/1",
+  "audio": true
+ },
+ "bcast_keeper": {
+  "cls": "shooting goal (soccer)",
+  "file": "u8qcar0Q6c8_000060_000070.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30/1",
+  "audio": true
+ },
+ "bcast_ucl": {
+  "cls": "shooting goal (soccer)",
+  "file": "ZG7xzpVodq8_000008_000018.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 9.14,
+  "fps": "30/1",
+  "audio": true
+ },
+ "fans_stadium": {
+  "cls": "celebrating",
+  "file": "cfY98jrHPeo_000042_000052.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 5.4,
+  "fps": "30/1",
+  "audio": true
+ },
+ "fans_night": {
+  "cls": "celebrating",
+  "file": "CifJWV_o0Sg_000058_000068.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "fans_german": {
+  "cls": "celebrating",
+  "file": "GHsDNreE74Y_000056_000066.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "stadium_crowd": {
+  "cls": "juggling soccer ball",
+  "file": "FghyASlwfmQ_000011_000021.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 9.99,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "bernabeu": {
+  "cls": "shooting goal (soccer)",
+  "file": "q3mz-BXpmV4_000003_000013.mp4",
+  "w": 360,
+  "h": 360,
+  "dur": 9.65,
+  "fps": "30/1",
+  "audio": true
+ },
+ "golden_juggle": {
+  "cls": "juggling soccer ball",
+  "file": "EwSeC8A4ehc_000010_000020.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "golden_pass": {
+  "cls": "passing soccer ball",
+  "file": "GarcbamoKYg_000247_000257.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 10.03,
+  "fps": "359/12",
+  "audio": true
+ },
+ "kids_dirt": {
+  "cls": "shooting goal (soccer)",
+  "file": "40_-_IWKq88_000010_000020.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30/1",
+  "audio": true
+ }
+}
