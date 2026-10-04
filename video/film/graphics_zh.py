@@ -547,6 +547,9 @@ def zh_card(ctx, t, dur, num, title, years, upto_from, upto_to):
     n = len(title)
     sz = 170 if n <= 2 else 150
     fx_text(ctx, title, W / 2, H * 0.37, sz, t - 0.1, style, "serif", 900, tracking=0.25, stagger=0.12, alpha=a)
+    if style == "red":
+        crack(ctx, W / 2, H * 0.37, sz * n * 1.1, sz, t - 0.35, seed=n + 7)
+    ghost(ctx, years.split(" ")[0], t, W * 0.5, H * 0.40, 520, 0.12 * a, drift=25)
     for i in range(n):
         cxp = W / 2 + (i - (n - 1) / 2) * sz * 1.25
         shockwave(ctx, cxp, H * 0.37, t - 0.1 - i * 0.12, 380, RED if style == "red" else GOLD, 6)
@@ -562,13 +565,12 @@ def headline(ctx, t, dur, year, place, home="", hs="", as_="", away="", note="")
     lin(ctx, 0, 0, 1300, 0, [(0, (0, 0, 0), 0.65 * a), (0.6, (0, 0, 0), 0.3 * a), (1, (0, 0, 0), 0)])
     ctx.rectangle(0, y - 140, 1300, 360)
     ctx.fill()
+    ghost(ctx, f"{hs}:{as_}" if home else str(year).split(" ")[0], t, W * 0.62, H * 0.42, 460, 0.22 * a)
     brush(ctx, x - 50, y - 26, t, 520 if len(str(year)) <= 4 else 720, 132, alpha=0.95 * a)
     fx_text(ctx, str(year), x, y - 26, 132, t, "gold", "bebas", 400, tracking=0.04, stagger=0.05, anchor="l",
             alpha=a, depth=6)
     shockwave(ctx, x + 140, y - 26, t, 320, GOLD, 6)
-    k = ease_out(remap(t, 0.15, 0.55))
-    text(ctx, place, x + 6 + 30 * (1 - k), y + 70, 42, "sans", 800, CREAM, a * k, "lm", tracking=0.1,
-         shadow=0.9, shadow_blur=6)
+    typewriter(ctx, place, max(0.0, t - 0.15), x + 6, y + 70, 42, CREAM, a)
     if home:
         a2 = env(t - 0.35, dur - 0.35, 0.25, 0.35)
         yy = y + 150
@@ -593,8 +595,20 @@ def stamp(ctx, t, dur, text_, size=150, color="red", sub=""):
     shockwave(ctx, W / 2, H / 2 - 20, t, 900, c, 12)
     sparks_burst(ctx, W / 2, H / 2 - 20, t, 44, 1100, c)
     font = "bebas" if all(ch.isascii() for ch in text_) else "serif"
-    fx_text(ctx, text_, W / 2, H / 2 - 20, size, t, style, font, 900 if font == "serif" else 400, tracking=0.08,
-            stagger=0.05, alpha=a)
+    if style == "red" and t > 0.15:
+        sp = ease_out(remap(t, 0.15, 0.4)) * size * 0.05
+        for half, dy in ((0, -sp), (1, sp)):
+            ctx.save()
+            ctx.rectangle(0, 0 if half == 0 else H / 2 - 20, W, H / 2 - 20 if half == 0 else H)
+            ctx.clip()
+            ctx.translate(sp * (1 if half else -1) * 0.6, dy)
+            fx_text(ctx, text_, W / 2, H / 2 - 20, size, t, style, font, 900 if font == "serif" else 400,
+                    tracking=0.08, stagger=0.05, alpha=a)
+            ctx.restore()
+        crack(ctx, W / 2, H / 2 - 20, size * len(text_) * 0.9, size, t, seed=len(text_))
+    else:
+        fx_text(ctx, text_, W / 2, H / 2 - 20, size, t, style, font, 900 if font == "serif" else 400,
+                tracking=0.08, stagger=0.05, alpha=a)
     if sub:
         a2 = env(t - 0.35, dur - 0.35, 0.3, 0.4)
         brush(ctx, W / 2 - 330, H / 2 + size * 0.62 + 22, t - 0.35, 660, 70, alpha=0.9 * a2)
@@ -797,3 +811,112 @@ def versus(ctx, t, dur):
         fx_text(ctx, val, rx + 230, y, 86, ti, "silver", "bebas" if val.isascii() else "serif", 400 if val.isascii() else 900,
                 anchor="r", alpha=a, depth=4)
         shockwave(ctx, rx + 160, y, ti, 260, (0.7, 0.8, 0.9), 5)
+
+
+
+# ------------------------------------------------------------------ creative typography
+import re as _re  # noqa: E402
+
+HOT_WORDS = ["惨败", "惨遭逆转", "逆转", "无缘", "停止运营", "辞职", "出局", "一球未进", "一球未进", "差距", "眼泪",
+             "假球", "黑哨", "锒铛入狱", "泡沫", "谷底", "负于", "输给"]
+GLORY_WORDS = ["世界杯门票", "沸腾", "奇迹", "铜牌", "领奖台", "金牌", "世界纪录", "包揽", "冠军", "第一", "春天",
+               "中国球迷", "同进退", "共荣辱", "永远不会熄灭", "扑出", "世界波", "破门", "铿锵"]
+
+
+def _spans(s):
+    """Per-character style: 0 normal, 1 number (gold), 2 hot (red), 3 glory (gold)."""
+    st = [0] * len(s)
+    for m in _re.finditer(r"[0-9]+(?:比[0-9]+|:[0-9]+|年|月|日|枚|秒[0-9]*|分钟|米|强)?", s):
+        for i in range(m.start(), m.end()):
+            st[i] = 1
+    for words, k in ((HOT_WORDS, 2), (GLORY_WORDS, 3)):
+        for w_ in words:
+            for m in _re.finditer(_re.escape(w_), s):
+                for i in range(m.start(), m.end()):
+                    st[i] = k
+    return st
+
+
+def kinetic_sub(ctx, line, t, span, y, alpha=1.0):
+    """Subtitle that writes itself in time with the voice; numbers / key words pop in colour."""
+    from .gfx import text_width
+    base = 44
+    st = _spans(line)
+    sizes = [base if k == 0 else int(base * 1.32) for k in st]
+    widths = [text_width(ch, sz, "sans", 900 if k else 600) for ch, sz, k in zip(line, sizes, st)]
+    total = sum(widths)
+    x = W / 2 - total / 2
+    rate = len(line) / max(0.4, span * 0.82)
+    for i, (ch, sz, k, w_) in enumerate(zip(line, sizes, st, widths)):
+        ti = t - i / rate
+        if ti < 0:
+            break
+        a = smooth(remap(ti, 0, 0.12)) * alpha
+        pop = ease_out_back(remap(ti, 0, 0.25), 3.0) if k else ease_out(remap(ti, 0, 0.2))
+        dy = (1 - pop) * 16
+        sc = lerp(1.6, 1.0, pop) if k else 1.0
+        cx = x + w_ / 2
+        ctx.save()
+        ctx.translate(cx, y + dy)
+        ctx.scale(sc, sc)
+        if k == 0:
+            text(ctx, ch, 0, 0, sz, "sans", 600, (1, 1, 1), a, "mb", shadow=0.95, shadow_blur=6, shadow_off=(0, 2))
+        else:
+            col = {1: GOLD, 2: hexc("#ff3b30"), 3: hexc("#ffd36b")}[k]
+            text(ctx, ch, 0, 0, sz, "sans", 900, col, a, "mb", shadow=0.95, shadow_blur=6, shadow_off=(0, 2),
+                 glow_c=col, glow_a=0.55)
+        ctx.restore()
+        x += w_
+
+
+def ghost(ctx, s, t, x, y, size=420, alpha=0.16, drift=40):
+    """Huge outlined watermark text drifting behind graphics."""
+    from .graphics import outline_mask
+    if all(ch.isascii() for ch in s):
+        surf, w, h, _ = outline_mask(s, size, 3)
+        ctx.save()
+        ctx.translate(x - t * drift, y)
+        ctx.set_source_rgba(1, 1, 1, alpha)
+        ctx.mask_surface(surf, -w / 2, -h / 2)
+        ctx.restore()
+
+
+def typewriter(ctx, s, t, x, y, size, color=CREAM, alpha=1.0, cps=22, font="sans", weight=800):
+    from .gfx import text_width
+    n = int(t * cps)
+    shown = s[:n]
+    text(ctx, shown, x, y, size, font, weight, color, alpha, "lm", tracking=0.1, shadow=0.9, shadow_blur=6)
+    if n <= len(s) + 8 and int(t * 6) % 2 == 0:
+        cx = x + text_width(shown, size, font, weight, 0.1) + 6
+        ctx.set_source_rgba(*RED, alpha)
+        ctx.rectangle(cx, y - size * 0.45, size * 0.12, size * 0.9)
+        ctx.fill()
+
+
+def crack(ctx, x, y, w, h, t, seed=1, color=(0.05, 0.0, 0.0)):
+    """Jagged fracture lines spreading across a slammed word."""
+    if t < 0.12:
+        return
+    k = ease_out(remap(t, 0.12, 0.45))
+    g = np.random.default_rng(seed)
+    ctx.save()
+    for b in range(3):
+        px, py = x + g.uniform(-w * 0.1, w * 0.1), y + g.uniform(-h * 0.2, h * 0.2)
+        ang = g.uniform(0, TAU)
+        pts = [(px, py)]
+        L = (w * 0.6) * k
+        steps = 7
+        for i in range(steps):
+            ang += g.normal(0, 0.6)
+            px += math.cos(ang) * L / steps
+            py += math.sin(ang) * L / steps * 0.6
+            pts.append((px, py))
+        for lw_, col, al in ((7, (1, 0.3, 0.2), 0.35), (3, color, 0.95)):
+            ctx.set_line_width(lw_)
+            ctx.set_line_join(1)
+            ctx.set_source_rgba(*col, al)
+            ctx.move_to(*pts[0])
+            for p_ in pts[1:]:
+                ctx.line_to(*p_)
+            ctx.stroke()
+    ctx.restore()

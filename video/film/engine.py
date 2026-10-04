@@ -589,6 +589,22 @@ def draw_subtitles(ctx, subs, T):
         if a - 0.1 <= T < b + 0.25:
             al = smooth(remap(T, a - 0.1, a + 0.08)) * smooth(remap(T, b + 0.25, b + 0.05))
             cjk = is_cjk(s)
+            if cjk and SUB_FONT == "sans":
+                band = cairo.LinearGradient(0, H - gx.BAR - 170, 0, H - gx.BAR)
+                band.add_color_stop_rgba(0, 0, 0, 0, 0)
+                band.add_color_stop_rgba(1, 0, 0, 0, 0.55 * al)
+                ctx.set_source(band)
+                ctx.rectangle(0, H - gx.BAR - 170, W, 170)
+                ctx.fill()
+                shown = s.rstrip("，。；")
+                lines = wrap_cjk(shown, 50, 1560, SUB_FONT)
+                y0 = H - gx.BAR - 46 - (len(lines) - 1) * 66
+                done = 0
+                for i, ln in enumerate(lines):
+                    lt = (T - a) - (b - a) * done / max(1, len(shown))
+                    gz.kinetic_sub(ctx, ln, lt, (b - a) * len(ln) / max(1, len(shown)), y0 + i * 66, al)
+                    done += len(ln)
+                continue
             size = 44 if cjk else 40
             shown = s.rstrip("，。；") if cjk else s
             lines = wrap_cjk(shown, size, 1500, SUB_FONT) if cjk else wrap(s, size, 1500, SUB_FONT, 500)
