@@ -105,7 +105,7 @@ def main():
     a_off = f_start / FPS
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst,
                     "-ss", f"{a_off:.3f}", "-i", wav, "-map", "0:v", "-map", "1:a", "-c:v", "copy",
-                    "-c:a", "aac", "-b:a", "224k", "-shortest", "-movflags", "+faststart", args.out], check=True)
+                    "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac", "-b:a", "224k", "-shortest", "-movflags", "+faststart", args.out], check=True)
     for p in parts:
         os.remove(p[2])
     print(f"done: {args.out}  ({time.time() - t0:.0f}s)")
