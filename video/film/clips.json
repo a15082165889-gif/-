@@ -421,5 +421,140 @@
   "dur": 10.01,
   "fps": "30/1",
   "audio": true
+ },
+ "bw_match": {
+  "cls": "shooting goal (soccer)",
+  "file": "wnjdmqZHYwo_000004_000014.mp4",
+  "w": 350,
+  "h": 240,
+  "dur": 10.0,
+  "fps": "25/1",
+  "audio": true
+ },
+ "bw_crowd": {
+  "cls": "shooting goal (soccer)",
+  "file": "uAsnG9J19wQ_000000_000010.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "25/1",
+  "audio": true
+ },
+ "night_dirt": {
+  "cls": "shooting goal (soccer)",
+  "file": "sUQZOcCd4rw_000000_000010.mp4",
+  "w": 636,
+  "h": 360,
+  "dur": 7.69,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "keeper_dive": {
+  "cls": "shooting goal (soccer)",
+  "file": "T32r50XoXms_000027_000037.mp4",
+  "w": 360,
+  "h": 360,
+  "dur": 10.01,
+  "fps": "25/1",
+  "audio": true
+ },
+ "pen_kick": {
+  "cls": "shooting goal (soccer)",
+  "file": "V074y9x4mGU_000023_000033.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "24000/1001",
+  "audio": true
+ },
+ "red_hug": {
+  "cls": "shooting goal (soccer)",
+  "file": "Zl9K4WFGngQ_000017_000027.mp4",
+  "w": 320,
+  "h": 240,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "yellow_red": {
+  "cls": "shooting goal (soccer)",
+  "file": "Ydzk97aUd24_000059_000069.mp4",
+  "w": 320,
+  "h": 240,
+  "dur": 10.01,
+  "fps": "30/1",
+  "audio": true
+ },
+ "tvgol": {
+  "cls": "shooting goal (soccer)",
+  "file": "RgR05OpKRbg_000118_000128.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.01,
+  "fps": "30/1",
+  "audio": true
+ },
+ "freekick": {
+  "cls": "shooting goal (soccer)",
+  "file": "wksRi2beUP0_000006_000016.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 10.02,
+  "fps": "25/1",
+  "audio": true
+ },
+ "fist_stand": {
+  "cls": "pumping fist",
+  "file": "VF12Adty30U_000003_000013.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 6.01,
+  "fps": "30/1",
+  "audio": true
+ },
+ "sad_man": {
+  "cls": "crying",
+  "file": "MPxSV4mDpSQ_000032_000042.mp4",
+  "w": 352,
+  "h": 288,
+  "dur": 10.06,
+  "fps": "14917/1000",
+  "audio": true
+ },
+ "stadium_lights": {
+  "cls": "celebrating",
+  "file": "DtN9rhWLFe8_000007_000017.mp4",
+  "w": 384,
+  "h": 288,
+  "dur": 10.02,
+  "fps": "30/1",
+  "audio": true
+ },
+ "crowd_sea": {
+  "cls": "surfing crowd",
+  "file": "9Ib8cd0TccA_000024_000034.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 10.02,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "crowd_hands": {
+  "cls": "surfing crowd",
+  "file": "9divvBtLKXA_000003_000013.mp4",
+  "w": 640,
+  "h": 360,
+  "dur": 10.01,
+  "fps": "30000/1001",
+  "audio": true
+ },
+ "confetti": {
+  "cls": "celebrating",
+  "file": "GSag_swPW8Q_000107_000117.mp4",
+  "w": 1280,
+  "h": 720,
+  "dur": 6.57,
+  "fps": "30000/1001",
+  "audio": true
  }
 }

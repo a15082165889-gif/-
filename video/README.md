@@ -42,3 +42,23 @@ edit uses (Amazon S3) into `.models/` and `.footage/`.
 - **Music and sound design:** synthesized from scratch in `film/audio.py`.
 - **Map:** Natural Earth land outlines (public domain), pre-baked into `assets/map_dots.json`.
 - **Fonts:** Bebas Neue, Inter, Montserrat, Playfair Display, Caveat (SIL Open Font License).
+
+---
+
+# 大起大落 — 中国足球 1982–2026
+
+A second film built with the same pipeline: a hot-blooded Chinese-language documentary short on the
+rises and falls of Chinese football, from the 1982 qualifying play-off to the U23 team's Asian Games
+bronze on 3 October 2026, the Chongqing invitational defeats, and the fans who never left.
+
+```bash
+pip install "misaki[zh]"         # Chinese G2P for the voice (jieba may need a manual install)
+python3 build.py --film china    # -> build/china/china.mp4 and china_web.mp4
+```
+
+- Script: `film/china_story.py` (subtitle text + spoken text), edit: `film/china_edit.py`
+- Graphics: `film/graphics_zh.py` — title, chapter cards with the "ECG" rise-and-fall line, score
+  headlines, impact stamps, glitch text, penalty shoot-out board, bronze medal, fan map, chant typography,
+  embers, light leaks and streaks. Impacts also trigger camera shake + RGB split.
+- Sound: `film/audio_epic.py` — taiko, string ostinato, brass, braams, risers and a multi-voice
+  "中国队，加油！" crowd chant, switching mood chapter by chapter.

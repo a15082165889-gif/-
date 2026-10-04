@@ -16,18 +16,35 @@ import time
 from multiprocessing import Pool
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+if "--film" in sys.argv:  # must be set before the film package is imported
+    os.environ["FILM"] = sys.argv[sys.argv.index("--film") + 1]
 
 from film import engine  # noqa: E402
 from film.gfx import FPS, H, W  # noqa: E402
 from film.tts import synthesize  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-BUILD = os.path.join(HERE, "build")
+BUILD = engine.BUILD
 MODELS = os.path.join(HERE, ".models")
 KOKORO = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0"
 
 
+NOTO = {"NotoSansSC.ttf": "ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+        "NotoSerifSC.ttf": "ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf"}
+
+
+def ensure_fonts():
+    """The Chinese fonts are large, so they are fetched rather than committed."""
+    for name, path in NOTO.items():
+        p = os.path.join(HERE, "assets", "fonts", name)
+        if not os.path.exists(p):
+            print(f"  downloading {name}", flush=True)
+            subprocess.run(["curl", "-sSL", "-o", p, f"https://raw.githubusercontent.com/google/fonts/main/{path}"],
+                           check=True)
+
+
 def ensure_models():
+    ensure_fonts()
     os.makedirs(MODELS, exist_ok=True)
     for name, url in (("kokoro.onnx", f"{KOKORO}/kokoro-v1.0.int8.onnx"), ("voices.bin", f"{KOKORO}/voices-v1.0.bin")):
         p = os.path.join(MODELS, name)
@@ -40,12 +57,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stills", nargs="*", type=float)
     ap.add_argument("--plan", action="store_true")
+    ap.add_argument("--film", default="still_rolling", help="still_rolling | china")
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--crf", type=int, default=17, help="quality of the master render")
     ap.add_argument("--bitrate", default="8M", help="video bitrate of the delivery file (two-pass)")
-    ap.add_argument("--out", default=os.path.join(BUILD, "still_rolling.mp4"))
+    ap.add_argument("--out", default=None)
     ap.add_argument("--range", nargs=2, type=float, help="render only this time range (seconds)")
     args = ap.parse_args()
+    from film.project import NAME
+    args.out = args.out or os.path.join(BUILD, f"{NAME}.mp4")
     os.makedirs(BUILD, exist_ok=True)
     t0 = time.time()
 
@@ -84,10 +104,12 @@ def main():
         return
 
     print("sound", flush=True)
-    from film import audio
+    import importlib
+    from film.project import story
+    audio = importlib.import_module("film." + getattr(story, "AUDIO", "audio"))
     wav = os.path.join(BUILD, "mix.wav")
     audio.render(shots, total, voice, wav)
-    engine.write_srt(engine.build_subtitles(shots, voice), os.path.join(BUILD, "still_rolling.srt"))
+    engine.write_srt(engine.build_subtitles(shots, voice), args.out.replace(".mp4", ".srt"))
 
     print(f"picture: {total:.1f}s, {int(total * FPS)} frames", flush=True)
     f_start, f_end = 0, int(round(total * FPS))

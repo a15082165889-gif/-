@@ -6,7 +6,11 @@ import re
 
 import numpy as np
 
-from .story import NARRATION, SPEED, SPOKEN, VOICE
+from .project import story
+
+NARRATION, SPEED, SPOKEN, VOICE = story.NARRATION, story.SPEED, story.SPOKEN, story.VOICE
+LANG = getattr(story, "LANG", "en-us")
+SPOKEN_LINES = getattr(story, "SPOKEN_LINES", {})
 
 SR = 24000
 
@@ -24,15 +28,23 @@ def synthesize(build_dir, model_dir):
     os.makedirs(out_dir, exist_ok=True)
     kokoro = None
     result = {}
+    g2p = None
     for lid, text in NARRATION.items():
-        spoken = _spoken(text)
+        spoken = _spoken(SPOKEN_LINES.get(lid, text))
         key = hashlib.sha1(f"{VOICE}|{SPEED}|{spoken}".encode()).hexdigest()[:12]
         path = os.path.join(out_dir, f"{lid}-{key}.wav")
         if not os.path.exists(path):
             if kokoro is None:
                 from kokoro_onnx import Kokoro
                 kokoro = Kokoro(os.path.join(model_dir, "kokoro.onnx"), os.path.join(model_dir, "voices.bin"))
-            samples, sr = kokoro.create(spoken, voice=VOICE, speed=SPEED, lang="en-us")
+            if LANG == "zh":
+                if g2p is None:
+                    from misaki import zh
+                    g2p = zh.ZHG2P()
+                phonemes, _ = g2p(spoken)
+                samples, sr = kokoro.create(phonemes, voice=VOICE, speed=SPEED, is_phonemes=True)
+            else:
+                samples, sr = kokoro.create(spoken, voice=VOICE, speed=SPEED, lang="en-us")
             samples = _trim(np.asarray(samples, np.float32), sr)
             sf.write(path, samples, sr)
             print(f"  voice {lid}: {len(samples) / sr:.2f}s", flush=True)

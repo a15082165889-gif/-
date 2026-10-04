@@ -184,7 +184,8 @@ def zoom(ctx, s, cx=W / 2, cy=H / 2, dx=0.0, dy=0.0):
 
 # ---------------------------------------------------------------- text
 FONTS = {"bebas": "BebasNeue.ttf", "inter": "Inter.ttf", "mont": "Montserrat.ttf",
-         "play": "PlayfairDisplay.ttf", "caveat": "Caveat.ttf"}
+         "play": "PlayfairDisplay.ttf", "caveat": "Caveat.ttf", "sans": "NotoSansSC.ttf",
+         "serif": "NotoSerifSC.ttf"}
 
 
 @lru_cache(maxsize=256)

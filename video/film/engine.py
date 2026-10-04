@@ -14,12 +14,17 @@ import cairo
 import numpy as np
 
 from . import graphics as gx
-from .edit import DEFAULTS, SHOTS
-from .gfx import FPS, H, ROOT, W, clamp, ease_in_out, grade, lerp, merge_look, remap, smooth, text, wrap
-from .story import NARRATION
+from . import graphics_zh as gz
+from .gfx import FPS, H, ROOT, W, clamp, ease_in_out, ease_out, grade, lerp, merge_look, remap, smooth, text, wrap
+from .project import SUBDIR, edit, story
+
+DEFAULTS, SHOTS = edit.DEFAULTS, edit.SHOTS
+NARRATION = story.NARRATION
+SUB_FONT = getattr(story, "SUB_FONT", "inter")
 
 FOOTAGE = os.path.join(ROOT, ".footage")
-BUILD = os.path.join(ROOT, "build")
+BUILD = os.path.join(ROOT, "build", SUBDIR)
+SEG = os.path.join(ROOT, "build", "seg")
 CLIPS = json.load(open(os.path.join(ROOT, "film", "clips.json")))
 K700 = "https://s3.amazonaws.com/kinetics/700_2020"
 
@@ -108,8 +113,8 @@ class Shot:
                     s.dur = (sp["b"] - sp["a"]) / s.speed
             elif s.kind in ("black", "photo"):
                 s.dur = sp["dur"]
-            elif s.kind == "map":
-                s.dur = None
+            elif s.kind in ("map", "bg", "chinamap"):
+                s.dur = None if sp.get("fill", True) else sp["dur"]
             segs.append(s)
         fixed = sum(s.dur for s in segs if s.dur is not None) - sum(s.x for s in segs[:-1])
         for s in segs:
@@ -159,8 +164,8 @@ def seg_key(s):
 
 def prepare_segment(s):
     """Transcode a clip segment to 1920x1080 @ FPS (speed-adjusted). Returns the cache path."""
-    os.makedirs(os.path.join(BUILD, "seg"), exist_ok=True)
-    out = os.path.join(BUILD, "seg", seg_key(s) + (".png" if s.spec.get("freeze") else ".mp4"))
+    os.makedirs(SEG, exist_ok=True)
+    out = os.path.join(SEG, seg_key(s) + (".png" if s.spec.get("freeze") else ".mp4"))
     s.path = out
     if os.path.exists(out):
         return out
@@ -175,9 +180,10 @@ def prepare_segment(s):
               f"[b]scale=-2:{H}:flags=lanczos{sharpen}[fg];[bg][fg]overlay=(W-w)*{s.spec.get('fit_x', 0.5)}:0")
     else:
         vf = f"{pre}scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos,crop={W}:{H}{sharpen}"
+    tmp = out.replace(".mp4", ".tmp.mp4").replace(".png", ".tmp.png")
     if s.spec.get("freeze"):
         cmd = ["ffmpeg", "-v", "error", "-y", "-ss", f"{s.a:.3f}", "-i", src, "-frames:v", "1",
-               "-filter_complex" if "split" in vf else "-vf", vf, out]
+               "-filter_complex" if "split" in vf else "-vf", vf, tmp]
     else:
         need = s.dur * s.speed + 0.25
         timing = f"setpts=(PTS-STARTPTS)/{s.speed:.5f}"
@@ -188,8 +194,9 @@ def prepare_segment(s):
         full = f"{timing},{vf}"
         cmd = ["ffmpeg", "-v", "error", "-y", "-ss", f"{s.a:.3f}", "-t", f"{need:.3f}", "-i", src, "-an",
                "-filter_complex", full, "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "veryfast",
-               "-crf", "12", "-g", "15", out]
+               "-crf", "12", "-g", "15", tmp]
     subprocess.run(cmd, check=True)
+    os.replace(tmp, out)
     return out
 
 
@@ -202,7 +209,7 @@ def prepare_all(shots, jobs=4):
     for sh in shots:
         for s in sh.segs:
             if s.kind == "photo":
-                p = os.path.join(BUILD, "seg", f"still_{s.spec['clip']}_{s.spec['at']}.png")
+                p = os.path.join(SEG, f"still_{s.spec['clip']}_{s.spec['at']}.png")
                 if not os.path.exists(p):
                     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(s.spec["at"]), "-i",
                                     clip_path(s.spec["clip"]), "-frames:v", "1", p], check=True)
@@ -276,7 +283,28 @@ class Renderer:
         self.frame_surf = None
         self.small = cairo.ImageSurface(cairo.FORMAT_ARGB32, W // 8, H // 8)
         self.subs = build_subtitles(shots, voice)
+        self.hits = sorted(sh.start + (sh.resolve(t) if isinstance(t, str) else t)
+                           for sh in shots for t, name, g in sh.events
+                           if name in ("impact", "boom", "shake") and g >= 0.6)
         self._scan = None
+
+    def hit_fx(self, surf, T):
+        """Camera shake + RGB split right after impacts."""
+        a = _hit_amount(self.hits, T)
+        if a < 0.02:
+            return
+        surf.flush()
+        f = as_array(surf)
+        dx = int(round(math.sin(T * 91) * 18 * a))
+        dy = int(round(math.cos(T * 77) * 12 * a))
+        sp = int(round(10 * a))
+        g = np.roll(f, (dy, dx), axis=(0, 1))
+        out = g.copy()
+        if sp:
+            out[..., 2] = np.roll(g[..., 2], sp, axis=1)
+            out[..., 0] = np.roll(g[..., 0], -sp, axis=1)
+        f[...] = out
+        surf.mark_dirty()
 
     def reader(self, path):
         r = self.readers.get(path)
@@ -303,6 +331,8 @@ class Renderer:
         u = remap(lt, 0, s.dur)
         z0, z1 = sp.get("zoom", (1.0, 1.0))
         z = lerp(z0, z1, ease_in_out(u) * 0.6 + u * 0.4)
+        if sp.get("punch"):
+            z *= 1 + sp["punch"] * (1 - ease_out(remap(lt, 0, 0.35)))
         ctx.save()
         ctx.translate(W / 2, H / 2)
         if sp.get("shake"):
@@ -312,7 +342,8 @@ class Renderer:
             ctx.rotate(math.radians(sp["rot"]))
             z *= 1.0 + abs(math.radians(sp["rot"])) * 0.9
         ctx.scale(z, z)
-        ctx.translate(-W / 2, -H / 2)
+        fx, fy = sp.get("focus", (0.5, 0.5))
+        ctx.translate(-W * fx, -H * fy)
         if sp.get("blur"):
             sc = cairo.Context(self.small)
             sc.scale(1 / 8, 1 / 8)
@@ -385,6 +416,10 @@ class Renderer:
             gx.photo_scene(ctx, lt, s.dur, s.path, s.spec.get("caption", ""))
         elif s.kind == "map":
             gx.map_scene(ctx, lt, s.dur, s.spec.get("broken", False))
+        elif s.kind == "bg":
+            gz.background(ctx, lt, s.dur, s.spec.get("tone", "dark"))
+        elif s.kind == "chinamap":
+            gz.china_map(ctx, lt, s.dur)
 
     # ---------------------------------------------------------- shots
     def draw_shot(self, surf, sh, lt):
@@ -434,6 +469,8 @@ class Renderer:
             gx.china(ctx, t, dur)
         elif kind == "end_title":
             gx.end_title(ctx, t, dur)
+        else:
+            getattr(gz, kind)(ctx, t, dur, **p)
 
     def render(self, fi):
         T = fi / FPS
@@ -451,6 +488,8 @@ class Renderer:
             self.draw_shot(layer, sh, T - sh.start)
             ctx.set_source_surface(layer, 0, 0)
             ctx.paint_with_alpha(a)
+        self.hit_fx(out, T)
+        ctx = cairo.Context(out)
         # final fade from/to black
         edge = min(smooth(remap(T, 0, 1.2)), smooth(remap(T, self.total, self.total - 1.0)))
         if edge < 1:
@@ -464,6 +503,14 @@ class Renderer:
         draw_subtitles(ctx, self.subs, T)
         out.flush()
         return bytes(out.get_data())
+
+
+def _hit_amount(hits, T, length=0.32):
+    a = 0.0
+    for h in hits:
+        if h <= T < h + length:
+            a = max(a, (1 - (T - h) / length) ** 2)
+    return a
 
 
 def window_frame(ctx):
@@ -482,20 +529,41 @@ def window_frame(ctx):
 
 
 # ------------------------------------------------------------------ subtitles
-def split_line(text_, max_chars=92):
+def split_line(text_, max_chars=None):
+    cjk = is_cjk(text_)
+    max_chars = max_chars or (34 if cjk else 92)
     if len(text_) <= max_chars:
         return [text_]
-    parts = re.split(r"(?<=[,.;])\s+", text_)
+    parts = re.split(r"(?<=[，。；！？—])", text_) if cjk else re.split(r"(?<=[,.;])\s+", text_)
+    parts = [p for p in parts if p]
     chunks, cur = [], ""
     for p in parts:
         if cur and len(cur) + 1 + len(p) > max_chars:
             chunks.append(cur)
             cur = p
         else:
-            cur = (cur + " " + p).strip()
+            cur = (cur + p) if cjk else (cur + " " + p).strip()
     if cur:
         chunks.append(cur)
     return chunks
+
+
+def is_cjk(s):
+    return any("\u4e00" <= ch <= "\u9fff" for ch in s)
+
+
+def wrap_cjk(s, size, max_w, font):
+    from .gfx import text_width
+    lines, cur = [], ""
+    for ch in s:
+        if cur and text_width(cur + ch, size, font, 500) > max_w:
+            lines.append(cur)
+            cur = ch.lstrip()
+        else:
+            cur += ch
+    if cur:
+        lines.append(cur)
+    return lines
 
 
 def build_subtitles(shots, voice):
@@ -517,10 +585,13 @@ def draw_subtitles(ctx, subs, T):
     for a, b, s in subs:
         if a - 0.1 <= T < b + 0.25:
             al = smooth(remap(T, a - 0.1, a + 0.08)) * smooth(remap(T, b + 0.25, b + 0.05))
-            lines = wrap(s, 40, 1500, "inter", 500)
-            y0 = H - gx.BAR - 46 - (len(lines) - 1) * 52
+            cjk = is_cjk(s)
+            size = 44 if cjk else 40
+            shown = s.rstrip("，。；") if cjk else s
+            lines = wrap_cjk(shown, size, 1500, SUB_FONT) if cjk else wrap(s, size, 1500, SUB_FONT, 500)
+            y0 = H - gx.BAR - 46 - (len(lines) - 1) * 58
             for i, ln in enumerate(lines):
-                text(ctx, ln, W / 2, y0 + i * 52, 40, "inter", 500, (1, 1, 1), al, "mb", shadow=0.95,
+                text(ctx, ln, W / 2, y0 + i * 58, size, SUB_FONT, 500, (1, 1, 1), al, "mb", shadow=0.95,
                      shadow_blur=6, shadow_off=(0, 2))
 
 
@@ -542,11 +613,11 @@ def render_chunk(args):
     for sh in shots:
         for s in sh.segs:
             if s.kind == "clip":
-                s.path = os.path.join(BUILD, "seg", seg_key(s) + (".png" if s.spec.get("freeze") else ".mp4"))
+                s.path = os.path.join(SEG, seg_key(s) + (".png" if s.spec.get("freeze") else ".mp4"))
                 if getattr(s, "screen", None):
-                    s.screen.path = os.path.join(BUILD, "seg", seg_key(s.screen) + ".mp4")
+                    s.screen.path = os.path.join(SEG, seg_key(s.screen) + ".mp4")
             elif s.kind == "photo":
-                s.path = os.path.join(BUILD, "seg", f"still_{s.spec['clip']}_{s.spec['at']}.png")
+                s.path = os.path.join(SEG, f"still_{s.spec['clip']}_{s.spec['at']}.png")
     r = Renderer(shots, total, voice)
     enc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgra", "-s", f"{W}x{H}",
                             "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", str(crf),
