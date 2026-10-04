@@ -126,10 +126,10 @@ def render(shots, total, voice, out_wav):
         if x is not None:
             place(fx, x, c - off, 0.6)
     print("  music cues", flush=True)
-    mus = apply_cues(shots, total, n, np.zeros((2, n)))[:, :n]
+    mus = np.zeros((2, n)) if os.environ.get("NO_MUSIC") else apply_cues(shots, total, n, np.zeros((2, n)))[:, :n]
     if mus.shape[1] < n:
         mus = np.pad(mus, ((0, 0), (0, n - mus.shape[1])))
-    mus = mus / (np.max(np.abs(mus)) + 1e-9) * 0.5
+    mus = mus / (np.max(np.abs(mus)) + 1e-9) * 0.5 if np.any(mus) else mus
     # duck music under the live layer (voices and roars stay on top)
     env = np.abs(live).mean(axis=0)
     win = int(0.08 * SR)

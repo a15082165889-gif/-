@@ -1081,5 +1081,7 @@ def victory_end(ctx, t, dur):
             alpha=a)
     a3 = env(t - 5.0, dur - 5.0, 1.0, 1.2) * 0.55
     from .project import story
-    for i, ln in enumerate([getattr(story, "FOOTAGE_CREDITS", ""), getattr(story, "MUSIC_CREDITS", "")]):
+    import os as _os
+    mc = "" if _os.environ.get("NO_MUSIC") else getattr(story, "MUSIC_CREDITS", "")
+    for i, ln in enumerate([getattr(story, "FOOTAGE_CREDITS", ""), mc]):
         text(ctx, ln, W / 2, H - BAR - 90 + i * 32, 21, "sans", 400, CREAM, a3, "mm", tracking=0.03)
